@@ -1,0 +1,153 @@
+'use client';
+
+import { useState } from 'react';
+import useSWR from 'swr';
+import { Send, Clock, Mail, Search } from 'lucide-react';
+import WidgetSkeleton from './WidgetSkeleton';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+export default function GmailWidget({ limit = 10 }: { limit?: number }) {
+  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Use 'is:unread' for Recent, and broader inbox fetch for 'All'
+  const gmailQuery = viewMode === 'recent' ? 'is:unread' : 'label:INBOX';
+  const fetchLimit = viewMode === 'recent' ? 20 : 50;
+
+  const { data: messages, isLoading } = useSWR(`/api/workspace/gmail?limit=${fetchLimit}&q=${encodeURIComponent(gmailQuery)}`, fetcher, {
+    refreshInterval: 1000 * 60 * 5,
+  });
+
+  if (isLoading) return <WidgetSkeleton />;
+
+  // Local filtering for search
+  const displayMessages = (messages || []).filter((msg: any) => {
+    const q = searchQuery.toLowerCase();
+    return msg.subject.toLowerCase().includes(q) || 
+           msg.from.toLowerCase().includes(q) ||
+           msg.snippet.toLowerCase().includes(q);
+  });
+
+  return (
+    <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: 0, height: "100%", display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
+          <Mail size={20} />
+          <h3 style={{ fontWeight: 600 }}>Gmail Inbox</h3>
+        </div>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+            {messages?.filter((m: any) => m.isUnread).length} Unread
+          </span>
+
+          {/* View Mode Toggle */}
+          <div style={{ 
+            background: "rgba(255,255,255,0.05)", 
+            padding: "2px", 
+            borderRadius: "8px", 
+            display: "flex",
+            border: "1px solid var(--glass-border)"
+          }}>
+            <button 
+              onClick={() => { setViewMode('recent'); setSearchQuery(''); }}
+              style={{ 
+                padding: "4px 10px", 
+                borderRadius: "6px", 
+                fontSize: "0.75rem", 
+                fontWeight: 600,
+                background: viewMode === 'recent' ? "var(--accent-primary)" : "transparent",
+                color: viewMode === 'recent' ? "black" : "var(--text-muted)",
+                transition: "all 0.2s"
+              }}
+            >
+              Recent
+            </button>
+            <button 
+              onClick={() => { setViewMode('all'); setSearchQuery(''); }}
+              style={{ 
+                padding: "4px 10px", 
+                borderRadius: "6px", 
+                fontSize: "0.75rem", 
+                fontWeight: 600,
+                background: viewMode === 'all' ? "var(--accent-primary)" : "transparent",
+                color: viewMode === 'all' ? "black" : "var(--text-muted)",
+                transition: "all 0.2s"
+              }}
+            >
+              All
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ position: "relative", marginBottom: "20px" }}>
+        <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search emails, senders, or subjects..."
+          style={{
+            width: "100%",
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid var(--glass-border)",
+            borderRadius: "10px",
+            padding: "8px 12px 8px 34px",
+            color: "white",
+            fontSize: "0.85rem",
+            outline: "none"
+          }}
+        />
+      </div>
+
+      <div style={{ 
+        flex: 1, 
+        display: "flex", 
+        flexDirection: "column", 
+        gap: "12px",
+        overflowY: "auto",
+        paddingRight: "4px"
+      }}>
+        {displayMessages.map((msg: any) => (
+          <a 
+            key={msg.id} 
+            href={`https://mail.google.com/mail/u/0/#inbox/${msg.threadId}`}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="glass-card hover-opacity" 
+            style={{ 
+              padding: "14px 16px", 
+              display: "block",
+              textDecoration: "none",
+              flexShrink: 0
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+              <span style={{ fontWeight: 600, fontSize: "0.85rem", color: msg.isUnread ? "var(--text-primary)" : "var(--text-secondary)" }}>
+                {msg.from.split('<')[0].trim()}
+              </span>
+              <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "4px" }}>
+                <Clock size={11} />
+                {new Date(msg.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+            <p style={{ fontSize: "0.8rem", fontWeight: msg.isUnread ? 500 : 400, color: "var(--text-primary)", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {msg.subject}
+            </p>
+            <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+              {msg.snippet}
+            </p>
+          </a>
+        ))}
+        {displayMessages.length === 0 && (
+          <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "40px 20px" }}>
+            <Mail size={32} style={{ opacity: 0.2, marginBottom: "12px" }} />
+            <p style={{ fontSize: "0.85rem" }}>No matching emails found.</p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
