@@ -1,30 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { Notebook, Clock, ExternalLink, Search } from 'lucide-react';
 import WidgetSkeleton from './WidgetSkeleton';
+import NotionNoteEditor from './widgets/NotionNoteEditor';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function NotionWidget({ limit = 100 }: { limit?: number }) {
-  const { data: notes, error, isLoading } = useSWR('/api/workspace/notion', fetcher, {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
+  const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const { data: notes, error, isLoading } = useSWR(`/api/workspace/notion${debouncedQuery ? `?q=${encodeURIComponent(debouncedQuery)}` : ''}`, fetcher, {
     refreshInterval: 1000 * 60 * 10, // 10 minutes polling
   });
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
-
   if (isLoading) return <WidgetSkeleton />;
 
-  // Filter notes based on search query
-  const displayNotes = (notes || []).filter((note: any) => {
-    const query = searchQuery.toLowerCase();
-    return note.title.toLowerCase().includes(query) || 
-           (note.notebook && note.notebook.toLowerCase().includes(query));
-  });
+  // We no longer need client-side filtering because notion.search handles full-text search!
+  const displayNotes = notes || [];
 
-  const finalNotes = viewMode === 'recent' ? displayNotes.slice(0, 10) : displayNotes;
+  const finalNotes = viewMode === 'recent' 
+    ? displayNotes.slice(0, 10) 
+    : [...displayNotes].sort((a: any, b: any) => a.title.localeCompare(b.title));
+
+  if (activeNoteId) {
+    const activeNote = notes?.find((n: any) => n.id === activeNoteId);
+    if (activeNote) {
+      return (
+        <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", minHeight: "300px", maxHeight: "400px", height: "100%", display: "flex", flexDirection: "column" }}>
+          <NotionNoteEditor 
+            note={activeNote} 
+            onBack={() => {
+              setActiveNoteId(null);
+              setViewMode('recent');
+            }} 
+          />
+        </section>
+      );
+    }
+  }
 
   return (
     <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", minHeight: "300px", maxHeight: "400px", height: "100%", display: "flex", flexDirection: "column" }}>
@@ -102,16 +125,14 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
         paddingRight: "4px" 
       }}>
         {finalNotes.map((note: any) => (
-          <a 
+          <div 
             key={note.id} 
-            href={note.url} 
-            target="_blank" 
-            rel="noopener noreferrer"
+            onClick={() => setActiveNoteId(note.id)}
             className="glass-card hover-opacity" 
             style={{ 
               padding: "16px", 
               display: "block",
-              textDecoration: "none",
+              cursor: "pointer",
               flexShrink: 0
             }}
           >
@@ -122,7 +143,16 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
                   {note.title}
                 </span>
               </div>
-              <ExternalLink size={13} style={{ color: "var(--text-muted)" }} />
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(note.url, '_blank', 'noopener,noreferrer');
+                }}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
+                title="Open in Notion"
+              >
+                <ExternalLink size={13} style={{ color: "var(--text-muted)" }} className="hover-opacity" />
+              </button>
             </div>
             
             <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
@@ -142,7 +172,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
                 {new Date(note.lastEdited).toLocaleDateString()}
               </span>
             </div>
-          </a>
+          </div>
         ))}
         {finalNotes.length === 0 && (
           <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "40px 20px" }}>

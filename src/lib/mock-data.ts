@@ -127,3 +127,18 @@ export const MOCK_CALENDAR_EVENTS = [
     hangoutLink: "https://meet.google.com/xyz-pdqr-stuv",
   },
 ];
+
+export const MOCK_NOTION_CONTENT: Record<string, any[]> = {
+  'notion-1': [
+    { id: 'b1', type: 'paragraph', text: 'Q2 is looking solid. We need to focus on growth.' },
+    { id: 'b2', type: 'paragraph', text: 'Marketing is ramping up spend by 20%.' }
+  ],
+  'notion-2': [
+    { id: 'b3', type: 'paragraph', text: 'dy/dx + P(x)y = Q(x)' },
+    { id: 'b4', type: 'paragraph', text: 'Integrating factor: e^(integral P(x)dx)' }
+  ],
+  'notion-3': [
+    { id: 'b5', type: 'paragraph', text: 'Google SWE role applied.' },
+    { id: 'b6', type: 'paragraph', text: 'Waiting to hear back from recruiters.' }
+  ]
+};

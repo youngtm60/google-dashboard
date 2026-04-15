@@ -20,69 +20,47 @@ export async function getNotionNotes(query?: string) {
   }
 
   try {
-    const notebooks = [
-      { id: personalId, label: 'Personal' },
-      { id: byuId, label: 'BYU Notes' }
-    ].filter(n => n.id);
+    const searchParams: any = {
+      filter: { property: 'object', value: 'page' },
+      sort: { direction: 'descending', timestamp: 'last_edited_time' },
+      page_size: 100,
+    };
 
-    const allPages = await Promise.all(
-      notebooks.map(async (notebook) => {
-        try {
-          const filter: any = query ? {
-            property: 'Name',
-            title: {
-              contains: query
-            }
-          } : undefined;
+    if (query) {
+      searchParams.query = query;
+    }
 
-          // Attempt to query as a database with filter
-          const response = await notion.databases.query({
-            database_id: notebook.id!,
-            filter: filter,
-            sorts: [{ timestamp: 'last_edited_time', direction: 'descending' }],
-            page_size: 100,
-          });
+    const response = await notion.search(searchParams);
 
-          return response.results.map((page: any) => {
-            const title = page.properties.Name?.title?.[0]?.plain_text || 
-                          page.properties.title?.title?.[0]?.plain_text || 
-                          'Untitled';
-            
-            return {
-              id: page.id,
-              title: title,
-              notebook: notebook.label,
-              lastEdited: page.last_edited_time,
-              url: page.url,
-              icon: page.icon?.emoji || '📄'
-            };
-          });
-        } catch (dbError) {
-          // If it fails as a database, it might be a parent page
-          // Fetching children pages of a parent page
-          const response = await notion.blocks.children.list({
-            block_id: notebook.id!,
-            page_size: 100,
-          });
+    const allPages = response.results.map((page: any) => {
+      const title = page.properties?.Name?.title?.[0]?.plain_text || 
+                    page.properties?.title?.title?.[0]?.plain_text || 
+                    'Untitled Note';
+      
+      // Attempt to categorize based on parent if known, else 'Workspace'
+      let notebook = 'Workspace';
+      if (page.parent?.type === 'database_id') {
+        const parentId = page.parent.database_id.replace(/-/g, '');
+        if (personalId && parentId === personalId.replace(/-/g, '')) notebook = 'Personal';
+        if (byuId && parentId === byuId.replace(/-/g, '')) notebook = 'BYU Notes';
+      } else if (page.parent?.type === 'page_id') {
+        const parentId = page.parent.page_id.replace(/-/g, '');
+        if (personalId && parentId === personalId.replace(/-/g, '')) notebook = 'Personal';
+        if (byuId && parentId === byuId.replace(/-/g, '')) notebook = 'BYU Notes';
+      }
 
-          const pages = response.results.filter((block: any) => block.type === 'child_page');
-          
-          return pages.map((page: any) => ({
-            id: page.id,
-            title: page.child_page.title,
-            notebook: notebook.label,
-            lastEdited: new Date().toISOString(), // Block children list doesn't give last_edited_time easily
-            url: `https://notion.so/${page.id.replace(/-/g, '')}`,
-            icon: '📄'
-          }));
-        }
-      })
-    );
+      return {
+        id: page.id,
+        title: title,
+        notebook: notebook,
+        lastEdited: page.last_edited_time,
+        url: page.url,
+        icon: page.icon?.emoji || '📄'
+      };
+    });
 
-    // Flatten and sort by last edited
-    return allPages.flat().sort((a, b) => 
-      new Date(b.lastEdited).getTime() - new Date(a.lastEdited).getTime()
-    );
+    // We no longer need to flatten or sort, as search API handles descending order.
+    return allPages;
 
   } catch (error) {
     console.error('Notion API Error:', error);
