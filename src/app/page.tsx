@@ -227,33 +227,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Widget Grid */}
-      {/* Top Row: Today, Tasks, Notion, Drive (Force 4 columns) */}
-      <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "repeat(4, 1fr)", 
-        gap: "16px",
-        marginBottom: "16px",
-        flexShrink: 0
-      }}>
-        <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
-          <TodayWidget />
-        </div>
-
-        <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
-          <TasksWidget />
-        </div>
-
-        <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
-          <NotionWidget />
-        </div>
-
-        <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
-          <DriveWidget />
-        </div>
-      </div>
-
-      {/* Row 2: Gmail & Calendar (50/50 Split) */}
+      {/* Widget Grid - 3 Column Layout */}
       <div style={{ 
         flex: 1, 
         display: "flex", 
@@ -261,13 +235,30 @@ export default function Home() {
         minHeight: 0, 
         height: "100%",
         marginBottom: "0px",
-        overflow: "hidden" // Ensure no overflow from the row itself
+        overflow: "hidden"
       }}>
-        <div style={{ flex: 1, height: "100%", minWidth: 0, display: "flex", flexDirection: "column" }}>
-          <GmailWidget limit={10} />
+        {/* Left Column (Today + Tasks) */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
+          <TodayWidget />
+          <TasksWidget />
         </div>
-        <div style={{ flex: 1, height: "100%", minWidth: 0, display: "flex", flexDirection: "column" }}>
-          <CalendarWidget />
+
+        {/* Center Column (Notes + Calendar) */}
+        <div style={{ flex: 1.2, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, height: "100%" }}>
+          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+            <NotionWidget />
+          </div>
+          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+            <CalendarWidget />
+          </div>
+        </div>
+
+        {/* Right Column (Gmail + Drive) */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, height: "100%" }}>
+          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+            <GmailWidget limit={10} />
+          </div>
+          <DriveWidget />
         </div>
       </div>
 

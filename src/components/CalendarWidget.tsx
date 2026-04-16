@@ -7,10 +7,14 @@ import {
   Search, 
   MapPin, 
   Video, 
-  Clock, 
-  ChevronRight,
-  ExternalLink
+  Clock,
+  Plus,
+  Settings2,
+  Check
 } from 'lucide-react';
+import CalendarEventDetail from './widgets/CalendarEventDetail';
+import CalendarEventCreate from './widgets/CalendarEventCreate';
+import { fetchCalendarList } from '@/lib/actions/calendar-actions';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -22,46 +26,75 @@ interface CalendarEvent {
   location?: string;
   description?: string;
   hangoutLink?: string;
+  calendarId?: string;
+}
+
+interface CalendarInfo {
+  id: string;
+  summary: string;
+  colorId: string;
 }
 
 export default function CalendarWidget() {
-  const { data: events, error, isLoading } = useSWR<CalendarEvent[]>('/api/workspace/calendar', fetcher, {
-    refreshInterval: 600000, // 10 minutes
-  });
+  const [selectedCalendars, setSelectedCalendars] = useState<string[]>(['primary']);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [calendarList, setCalendarList] = useState<CalendarInfo[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('dash_selected_cal_ids');
+    if (saved) {
+      try {
+        setSelectedCalendars(JSON.parse(saved));
+      } catch (e) {}
+    }
+  }, []);
+
+  const handleToggleCalendar = (id: string) => {
+    let newSelection = [...selectedCalendars];
+    if (newSelection.includes(id)) {
+      newSelection = newSelection.filter(c => c !== id);
+    } else {
+      newSelection.push(id);
+    }
+    if (newSelection.length === 0) newSelection = ['primary']; // ensure never completely empty
+    setSelectedCalendars(newSelection);
+    localStorage.setItem('dash_selected_cal_ids', JSON.stringify(newSelection));
+  };
+
+  const loadCalendars = async () => {
+    const res = await fetchCalendarList();
+    if (res.success && res.calendars) {
+      setCalendarList(res.calendars);
+    }
+  };
+
+  const toggleSettings = () => {
+    if (!isSettingsOpen && calendarList.length === 0) loadCalendars();
+    setIsSettingsOpen(!isSettingsOpen);
+  };
+
+  const { data: events, error, isLoading } = useSWR<CalendarEvent[]>(
+    `/api/workspace/calendar?calendars=${encodeURIComponent(selectedCalendars.join(','))}`, 
+    fetcher, 
+    { refreshInterval: 600000 }
+  );
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
-
-  // Auto-clear search on toggle
-  useEffect(() => {
-    setSearchQuery('');
-  }, [viewMode]);
+  const [activeEventId, setActiveEventId] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   const filteredEvents = useMemo(() => {
     if (!events || !Array.isArray(events)) return [];
     
     let filtered = events;
-
-    // View mode filtering
-    if (viewMode === 'recent') {
-      const today = new Date();
-      today.setHours(23, 59, 59, 999);
-      filtered = events.filter(event => {
-        const start = new Date(event.start.dateTime || event.start.date || '');
-        return start <= today;
-      });
-    }
-
-    // Search filtering
     if (searchQuery) {
       filtered = filtered.filter(event => 
         event.summary?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.location?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-
     return filtered;
-  }, [events, viewMode, searchQuery]);
+  }, [events, searchQuery]);
 
   const formatTime = (dateTimeStr?: string) => {
     if (!dateTimeStr) return 'All Day';
@@ -74,98 +107,130 @@ export default function CalendarWidget() {
     return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
   };
 
+  if (isCreating) {
+    return (
+      <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", flex: 1, height: "100%", minHeight: 0, display: "flex", flexDirection: "column" }}>
+        <CalendarEventCreate onBack={() => setIsCreating(false)} onSuccess={() => setIsCreating(false)} />
+      </section>
+    );
+  }
+
+  if (activeEventId && events) {
+    const activeEvent = events.find((e: CalendarEvent) => e.id === activeEventId);
+    if (activeEvent) {
+      return (
+        <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", height: "100%", minHeight: 0, display: "flex", flexDirection: "column" }}>
+          <CalendarEventDetail event={activeEvent} onBack={() => setActiveEventId(null)} />
+        </section>
+      );
+    }
+  }
+
   return (
-    <section className="glass-panel" style={{ 
-      padding: "20px", 
-      borderRadius: "24px", 
-      height: "100%", 
-      minHeight: 0,
-      display: "flex", 
-      flexDirection: "column" 
+    <section className="glass-panel animate-fade-in" style={{ 
+      padding: "20px", borderRadius: "24px", flex: 1, height: "100%", minHeight: 0, display: "flex", flexDirection: "column" 
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-sky)" }}>
           <Calendar size={20} />
           <h3 style={{ fontWeight: 600 }}>Schedule</h3>
         </div>
-        
-        <div style={{ 
-          background: "rgba(255,255,255,0.05)", 
-          padding: "2px", 
-          borderRadius: "8px", 
-          display: "flex",
-          border: "1px solid var(--glass-border)"
-        }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <button 
-            onClick={() => setViewMode('recent')}
+            onClick={toggleSettings}
+            className="hover-opacity"
             style={{ 
-              padding: "4px 10px", 
-              borderRadius: "6px", 
-              fontSize: "0.7rem", 
-              fontWeight: 600,
-              background: viewMode === 'recent' ? "var(--accent-sky)" : "transparent",
-              color: viewMode === 'recent' ? "black" : "var(--text-muted)",
-              transition: "all 0.2s"
+              background: "rgba(255,255,255,0.05)", color: "white", border: "1px solid var(--glass-border)", 
+              borderRadius: "8px", padding: "4px", display: "flex", alignItems: "center", justifyContent: "center"
             }}
+            title="Select Calendars"
           >
-            Today
+            <Settings2 size={16} />
           </button>
           <button 
-            onClick={() => setViewMode('all')}
+            onClick={() => setIsCreating(true)}
+            className="hover-opacity"
             style={{ 
-              padding: "4px 10px", 
-              borderRadius: "6px", 
-              fontSize: "0.7rem", 
-              fontWeight: 600,
-              background: viewMode === 'all' ? "var(--accent-sky)" : "transparent",
-              color: viewMode === 'all' ? "black" : "var(--text-muted)",
-              transition: "all 0.2s"
+              background: "var(--accent-primary)", color: "white", border: "none", borderRadius: "8px", 
+              padding: "4px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 10px rgba(129, 140, 248, 0.4)"
             }}
+            title="Create new event"
           >
-            All
+            <Plus size={16} />
           </button>
         </div>
       </div>
+
+      {isSettingsOpen && (
+        <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "16px", border: "1px solid var(--glass-border)" }} className="animate-fade-in">
+          <h4 style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "10px", fontWeight: 600 }}>Caldendars in View</h4>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "150px", overflowY: "auto" }} className="custom-scrollbar">
+            {calendarList.length === 0 ? (
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontStyle: "italic" }}>Loading calendars...</p>
+            ) : (
+              calendarList.map(cal => {
+                const isSelected = selectedCalendars.includes(cal.id);
+                return (
+                  <div 
+                    key={cal.id} 
+                    onClick={() => handleToggleCalendar(cal.id)}
+                    style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
+                  >
+                    <div style={{ 
+                      width: "16px", height: "16px", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center",
+                      background: isSelected ? cal.colorId : "transparent",
+                      border: `1.5px solid ${cal.colorId}`
+                    }}>
+                      {isSelected && <Check size={12} color={cal.colorId === '#ffffff' ? "black" : "white"} strokeWidth={3} />}
+                    </div>
+                    <span style={{ fontSize: "0.8rem", color: isSelected ? "white" : "var(--text-muted)" }}>{cal.summary}</span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
 
       <div style={{ position: "relative", marginBottom: "16px" }}>
         <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
         <input 
           type="text" 
-          placeholder={`Search ${viewMode === 'recent' ? 'today\'s' : 'weekly'} events...`}
+          placeholder="Search upcoming events..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
-            width: "100%",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid var(--glass-border)",
-            borderRadius: "10px",
-            padding: "8px 12px 8px 36px",
-            fontSize: "0.8rem",
-            color: "var(--text-primary)",
-            outline: "none"
+            width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)",
+            borderRadius: "10px", padding: "8px 12px 8px 36px", fontSize: "0.8rem", color: "var(--text-primary)", outline: "none"
           }}
         />
       </div>
 
-      <div style={{ flex: 1, overflowY: "auto", pr: "4px" }} className="custom-scrollbar">
+      <div style={{ flex: 1, overflowY: "auto", paddingRight: "4px" }} className="custom-scrollbar">
         {isLoading ? (
           <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", textAlign: "center", marginTop: "20px" }}>Syncing schedule...</p>
+        ) : events && !Array.isArray(events) && (events as any).error ? (
+          <p style={{ color: "#ef4444", fontSize: "0.8rem", textAlign: "center", marginTop: "20px", padding: "10px" }}>
+            API Error: {(events as any).error}
+          </p>
         ) : filteredEvents.length === 0 ? (
           <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", textAlign: "center", marginTop: "20px" }}>
-            {searchQuery ? 'No matching events found.' : 'No events scheduled for this period.'}
+            {searchQuery ? 'No matching events found.' : 'No events scheduled for this period (next 90 days).'}
           </p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {filteredEvents.map((event) => (
               <div 
                 key={event.id}
-                className="glass-card"
+                onClick={() => setActiveEventId(event.id)}
+                className="glass-card hover-opacity"
                 style={{ 
                   padding: "12px", 
                   borderRadius: "16px",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "8px"
+                  gap: "8px",
+                  cursor: "pointer"
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -198,7 +263,10 @@ export default function CalendarWidget() {
 
                 {(event.hangoutLink || event.location?.includes('Meet')) && (
                   <button 
-                    onClick={() => event.hangoutLink && window.open(event.hangoutLink, '_blank')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      event.hangoutLink && window.open(event.hangoutLink, '_blank');
+                    }}
                     style={{ 
                       marginTop: "4px",
                       background: "rgba(56, 189, 248, 0.1)",
@@ -212,7 +280,8 @@ export default function CalendarWidget() {
                       alignItems: "center",
                       justifyContent: "center",
                       gap: "6px",
-                      width: "100%"
+                      width: "100%",
+                      cursor: "pointer"
                     }}
                   >
                     <Video size={14} />

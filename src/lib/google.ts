@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { MOCK_EMAILS, MOCK_TASKS, MOCK_FILES } from './mock-data';
+import { MOCK_EMAILS, MOCK_TASKS, MOCK_FILES, MOCK_CALENDAR_EVENTS } from './mock-data';
 
 const IS_MOCK = !process.env.GOOGLE_CLIENT_ID || process.env.USE_MOCK === 'true';
 
@@ -134,7 +134,32 @@ export async function getDriveFiles(accessToken?: string, query?: string) {
   }
 }
 
-export async function getGoogleCalendarEvents(accessToken?: string, maxResults: number = 20) {
+export async function getGoogleCalendarList(accessToken?: string) {
+  if (IS_MOCK || !accessToken) {
+    return [{ id: 'primary', summary: 'Primary Calendar', colorId: '#4285F4' }];
+  }
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const calendar = google.calendar({ version: 'v3', auth });
+
+  try {
+    const res = await calendar.calendarList.list({
+      showHidden: true,
+      maxResults: 250
+    });
+    return res.data.items?.map(c => ({
+      id: c.id,
+      summary: c.summaryOverride || c.summary,
+      colorId: c.backgroundColor || '#4285F4',
+    })) || [];
+  } catch (error) {
+    console.error('Calendar List API Error:', error);
+    return [{ id: 'primary', summary: 'Primary Calendar', colorId: '#4285F4' }];
+  }
+}
+
+export async function getGoogleCalendarEvents(accessToken?: string, maxResults: number = 20, calendarIds: string[] = ['primary']) {
   if (IS_MOCK || !accessToken) {
     return MOCK_CALENDAR_EVENTS;
   }
@@ -145,25 +170,125 @@ export async function getGoogleCalendarEvents(accessToken?: string, maxResults: 
   const calendar = google.calendar({ version: 'v3', auth });
 
   try {
-    const res = await calendar.events.list({
-      calendarId: 'primary',
-      timeMin: new Date().toISOString(),
-      maxResults,
-      singleEvents: true,
-      orderBy: 'startTime',
-    });
+    const allEvents = await Promise.all(
+      calendarIds.map(async (calId) => {
+        try {
+          const res = await calendar.events.list({
+            calendarId: calId,
+            timeMin: new Date().toISOString(),
+            timeMax: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+            maxResults: maxResults > 20 ? maxResults : 150,
+            singleEvents: true,
+            orderBy: 'startTime',
+          });
 
-    return res.data.items?.map(event => ({
-      id: event.id,
-      summary: event.summary,
-      start: event.start,
-      end: event.end,
-      location: event.location,
-      description: event.description,
-      hangoutLink: event.hangoutLink,
-    })) || [];
+          return res.data.items?.map(event => ({
+            id: event.id,
+            summary: event.summary,
+            start: event.start,
+            end: event.end,
+            location: event.location,
+            description: event.description,
+            hangoutLink: event.hangoutLink,
+            calendarId: calId // Tag with source calendar
+          })) || [];
+        } catch (err) {
+          console.error(`Calendar API Error for ${calId}:`, err);
+          return [];
+        }
+      })
+    );
+
+    // Flatten and sort by start time
+    return allEvents.flat().sort((a, b) => {
+      const timeA = new Date(a.start?.dateTime || a.start?.date || 0).getTime();
+      const timeB = new Date(b.start?.dateTime || b.start?.date || 0).getTime();
+      return timeA - timeB;
+    });
   } catch (error) {
     console.error('Calendar API Error:', error);
-    return MOCK_CALENDAR_EVENTS;
+    throw error;
+  }
+}
+
+export async function createGoogleCalendarEvent(
+  accessToken: string,
+  eventData: { summary: string; location?: string; description?: string; start: string; end: string }
+) {
+  if (IS_MOCK || !accessToken) {
+    // In mock mode, we would just simulate success
+    return { id: "mock-new-event-" + Date.now(), summary: eventData.summary };
+  }
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+
+  const calendar = google.calendar({ version: 'v3', auth });
+
+  try {
+    const res = await calendar.events.insert({
+      calendarId: 'primary',
+      requestBody: {
+        summary: eventData.summary,
+        location: eventData.location,
+        description: eventData.description,
+        start: { dateTime: eventData.start },
+        end: { dateTime: eventData.end },
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error('Calendar API Insert Error:', error);
+    throw error;
+  }
+}
+
+export async function updateGoogleCalendarEvent(
+  accessToken: string,
+  eventId: string,
+  eventData: { summary: string; location?: string; description?: string; start: string; end: string }
+) {
+  if (IS_MOCK || !accessToken) return { id: eventId, summary: eventData.summary };
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const calendar = google.calendar({ version: 'v3', auth });
+
+  try {
+    const res = await calendar.events.patch({
+      calendarId: 'primary',
+      eventId: eventId,
+      requestBody: {
+        summary: eventData.summary,
+        location: eventData.location,
+        description: eventData.description,
+        start: { dateTime: eventData.start },
+        end: { dateTime: eventData.end },
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Calendar API Update Error:', error);
+    throw error;
+  }
+}
+
+export async function deleteGoogleCalendarEvent(accessToken: string, eventId: string) {
+  if (IS_MOCK || !accessToken) return { success: true };
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const calendar = google.calendar({ version: 'v3', auth });
+
+  try {
+    await calendar.events.delete({
+      calendarId: 'primary',
+      eventId: eventId,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Calendar API Delete Error:', error);
+    throw error;
   }
 }

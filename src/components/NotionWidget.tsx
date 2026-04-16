@@ -36,7 +36,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
     const activeNote = notes?.find((n: any) => n.id === activeNoteId);
     if (activeNote) {
       return (
-        <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", minHeight: "300px", maxHeight: "400px", height: "100%", display: "flex", flexDirection: "column" }}>
+        <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
           <NotionNoteEditor 
             note={activeNote} 
             onBack={() => {
@@ -50,7 +50,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
   }
 
   return (
-    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", minHeight: "300px", maxHeight: "400px", height: "100%", display: "flex", flexDirection: "column" }}>
+    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-amber)" }}>
           <Notebook size={20} />

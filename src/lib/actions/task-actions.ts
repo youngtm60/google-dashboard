@@ -61,3 +61,51 @@ export async function completeTask(taskId: string, listId: string = '@default', 
     return { success: false, error: 'Failed to update task' };
   }
 }
+
+export async function editTaskTitle(taskId: string, listId: string, title: string) {
+  const session = await getServerSession(authOptions);
+  const accessToken = (session as any)?.accessToken;
+
+  if (IS_MOCK || !accessToken) return { success: true };
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const tasks = google.tasks({ version: 'v1', auth });
+
+  try {
+    await tasks.tasks.patch({
+      tasklist: listId,
+      task: taskId,
+      requestBody: { title },
+    });
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('Edit Task Error:', error);
+    return { success: false, error: 'Failed to edit task' };
+  }
+}
+
+export async function deleteTask(taskId: string, listId: string) {
+  const session = await getServerSession(authOptions);
+  const accessToken = (session as any)?.accessToken;
+
+  if (IS_MOCK || !accessToken) return { success: true };
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const tasks = google.tasks({ version: 'v1', auth });
+
+  try {
+    await tasks.tasks.delete({
+      tasklist: listId,
+      task: taskId,
+    });
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('Delete Task Error:', error);
+    return { success: false, error: 'Failed to delete task' };
+  }
+}
+
