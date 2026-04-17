@@ -19,18 +19,17 @@ export default function DriveWidget() {
     refreshInterval: 1000 * 60 * 5,
   });
 
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
-  const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
 
   if (isLoading) return <WidgetSkeleton />;
 
-  // Filter and mode logic
-  const displayFiles = (files || []).filter((file: any) => {
-    const query = searchQuery.toLowerCase();
-    return file.name.toLowerCase().includes(query);
-  });
-
-  const finalFiles = viewMode === 'recent' ? displayFiles.slice(0, 10) : displayFiles;
+  // Filter and mode logic (sorted by modified date descending)
+  const displayFiles = (files || [])
+    .sort((a: any, b: any) => new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime())
+    .filter((file: any) => {
+      const query = searchQuery.toLowerCase();
+      return file.name.toLowerCase().includes(query);
+    });
 
   return (
     <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", minHeight: "300px", maxHeight: "400px", height: "100%", display: "flex", flexDirection: "column" }}>
@@ -40,43 +39,7 @@ export default function DriveWidget() {
           <h3 style={{ fontWeight: 600 }}>Google Drive</h3>
         </div>
         
-        {/* View Mode Toggle */}
-        <div style={{ 
-          background: "rgba(255,255,255,0.05)", 
-          padding: "2px", 
-          borderRadius: "8px", 
-          display: "flex",
-          border: "1px solid var(--glass-border)"
-        }}>
-          <button 
-            onClick={() => { setViewMode('recent'); setSearchQuery(''); }}
-            style={{ 
-              padding: "4px 10px", 
-              borderRadius: "6px", 
-              fontSize: "0.7rem", 
-              fontWeight: 600,
-              background: viewMode === 'recent' ? "var(--accent-emerald)" : "transparent",
-              color: viewMode === 'recent' ? "black" : "var(--text-muted)",
-              transition: "all 0.2s"
-            }}
-          >
-            Recent
-          </button>
-          <button 
-            onClick={() => { setViewMode('all'); setSearchQuery(''); }}
-            style={{ 
-              padding: "4px 10px", 
-              borderRadius: "6px", 
-              fontSize: "0.7rem", 
-              fontWeight: 600,
-              background: viewMode === 'all' ? "var(--accent-emerald)" : "transparent",
-              color: viewMode === 'all' ? "black" : "var(--text-muted)",
-              transition: "all 0.2s"
-            }}
-          >
-            All
-          </button>
-        </div>
+
       </div>
 
       <div style={{ position: "relative", marginBottom: "20px" }}>
@@ -88,11 +51,11 @@ export default function DriveWidget() {
           placeholder="Search files..."
           style={{
             width: "100%",
-            background: "rgba(255,255,255,0.03)",
+            background: "var(--bg-deep)",
             border: "1px solid var(--glass-border)",
             borderRadius: "10px",
             padding: "8px 12px 8px 34px",
-            color: "white",
+            color: "var(--text-primary)",
             fontSize: "0.8rem",
             outline: "none"
           }}
@@ -107,7 +70,7 @@ export default function DriveWidget() {
         overflowY: "auto",
         paddingRight: "4px"
       }}>
-        {finalFiles.map((file: any) => (
+        {displayFiles.map((file: any) => (
           <a 
             key={file.id} 
             href={file.webViewLink} 
@@ -153,7 +116,7 @@ export default function DriveWidget() {
             </div>
           </a>
         ))}
-        {finalFiles.length === 0 && (
+        {displayFiles.length === 0 && (
           <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "40px 20px" }}>
             <Cloud size={32} style={{ opacity: 0.2, marginBottom: "12px" }} />
             <p style={{ fontSize: "0.85rem" }}>No matching files found.</p>

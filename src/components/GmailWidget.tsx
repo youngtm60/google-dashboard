@@ -10,16 +10,15 @@ import GmailCompose from './widgets/GmailCompose';
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function GmailWidget({ limit = 10 }: { limit?: number }) {
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
-  const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
   
   // Navigation State
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
   const [isComposing, setIsComposing] = useState(false);
 
-  // Use 'is:unread' for Recent, and broader inbox fetch for 'All'
-  const gmailQuery = viewMode === 'recent' ? 'is:unread' : 'label:INBOX';
-  const fetchLimit = viewMode === 'recent' ? 20 : 50;
+  // Use broader inbox fetch
+  const gmailQuery = 'label:INBOX';
+  const fetchLimit = 50;
 
   const { data: messages, isLoading } = useSWR(`/api/workspace/gmail?limit=${fetchLimit}&q=${encodeURIComponent(gmailQuery)}`, fetcher, {
     refreshInterval: 1000 * 60 * 5,
@@ -44,8 +43,10 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
     );
   }
 
-  // Local filtering for search
-  const displayMessages = (messages || []).filter((msg: any) => {
+  // Local filtering for search and sort by date
+  const displayMessages = (messages || [])
+    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .filter((msg: any) => {
     const q = searchQuery.toLowerCase();
     return msg.subject.toLowerCase().includes(q) || 
            msg.from.toLowerCase().includes(q) ||
@@ -83,43 +84,7 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
             {messages?.filter((m: any) => m.isUnread).length} Unread
           </span>
 
-          {/* View Mode Toggle */}
-          <div style={{ 
-            background: "rgba(255,255,255,0.05)", 
-            padding: "2px", 
-            borderRadius: "8px", 
-            display: "flex",
-            border: "1px solid var(--glass-border)"
-          }}>
-            <button 
-              onClick={() => { setViewMode('recent'); setSearchQuery(''); }}
-              style={{ 
-                padding: "4px 10px", 
-                borderRadius: "6px", 
-                fontSize: "0.75rem", 
-                fontWeight: 600,
-                background: viewMode === 'recent' ? "var(--accent-primary)" : "transparent",
-                color: viewMode === 'recent' ? "black" : "var(--text-muted)",
-                transition: "all 0.2s"
-              }}
-            >
-              Recent
-            </button>
-            <button 
-              onClick={() => { setViewMode('all'); setSearchQuery(''); }}
-              style={{ 
-                padding: "4px 10px", 
-                borderRadius: "6px", 
-                fontSize: "0.75rem", 
-                fontWeight: 600,
-                background: viewMode === 'all' ? "var(--accent-primary)" : "transparent",
-                color: viewMode === 'all' ? "black" : "var(--text-muted)",
-                transition: "all 0.2s"
-              }}
-            >
-              All
-            </button>
-          </div>
+
         </div>
       </div>
 
@@ -132,11 +97,11 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
           placeholder="Search emails, senders, or subjects..."
           style={{
             width: "100%",
-            background: "rgba(255,255,255,0.03)",
+            background: "var(--bg-deep)",
             border: "1px solid var(--glass-border)",
             borderRadius: "10px",
             padding: "8px 12px 8px 34px",
-            color: "white",
+            color: "var(--text-primary)",
             fontSize: "0.85rem",
             outline: "none"
           }}

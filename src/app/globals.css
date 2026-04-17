@@ -4,34 +4,33 @@ html {
 }
 
 :root {
-  /* Core Palette (Dark Nebula) */
-  --bg-deep: #05070a;
-  --bg-nebula: radial-gradient(circle at 0% 0%, #1a1b3a 0%, #05070a 50%),
-               radial-gradient(circle at 100% 100%, #2e1065 0%, #05070a 50%);
-  --foreground: #f8fafc;
+  /* Core Palette (Light Theme) */
+  --bg-deep: #f5f6f8; /* Soft off-white for the main background */
+  --bg-nebula: none; /* Removed the dark gradient */
+  --foreground: #111827; /* Dark text */
   
-  /* Glassmorphism Tokens */
-  --glass-bg: rgba(15, 23, 42, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.03);
-  --glass-blur: blur(16px);
+  /* Panel and Card Tokens */
+  --glass-bg: #ffffff; /* Solid white */
+  --glass-border: rgba(0, 0, 0, 0.04);
+  --glass-highlight: #ffffff;
+  --glass-blur: none;
   
   /* Accent Colors */
-  --accent-primary: #818cf8; /* Indigo 400 */
-  --accent-secondary: #c084fc; /* Purple 400 */
-  --accent-amber: #fbbf24; /* Amber 400 */
-  --accent-emerald: #34d399; /* Emerald 400 */
-  --accent-cyan: #22d3ee; /* Cyan 400 */
-  --accent-sky: #38bdf8; /* Sky 400 */
-  --accent-rose: #fb7185; /* Rose 400 */
+  --accent-primary: #6B5AED; /* Vibrant purple/indigo matching the screenshot */
+  --accent-secondary: #8B5CF6;
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-cyan: #06b6d4;
+  --accent-sky: #0ea5e9;
+  --accent-rose: #f43f5e;
   
   /* Semantic Tokens */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
   
-  --sidebar-width: 187px;
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --sidebar-width: 220px; /* Widened slightly to fit the new text */
+  --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -47,7 +46,7 @@ html, body {
   background-color: var(--bg-deep);
   background-image: var(--bg-nebula);
   background-attachment: fixed;
-  color: var(--foreground);
+  color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
 }
@@ -57,39 +56,36 @@ html, body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.2);
+  border: 1px solid rgba(0,0,0,0.05);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 /* Utilities */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-right: 1px solid var(--glass-border);
+  box-shadow: 1px 0 5px rgba(0, 0, 0, 0.02);
 }
 
 .glass-card {
   background: var(--glass-highlight);
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.02);
   transition: var(--transition-smooth);
 }
 
 .glass-card:hover {
-  border-color: rgba(129, 140, 248, 0.3);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(107, 90, 237, 0.15);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 15px rgba(0, 0, 0, 0.03);
   transform: translateY(-2px);
 }
 

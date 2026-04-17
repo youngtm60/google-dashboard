@@ -8,7 +8,10 @@ import {
   ArrowRight, 
   RefreshCw,
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  Search,
+  Bell,
+  Settings
 } from "lucide-react";
 import { useSWRConfig } from 'swr';
 import Link from "next/link";
@@ -99,7 +102,7 @@ export default function Home() {
           letterSpacing: "-0.04em",
           lineHeight: 1.1,
           marginBottom: "24px",
-          color: "#fff"
+          color: "var(--text-primary)"
         }}>
           All your Google tools. <br />
           <span className="accent-text-gradient">One unified vision.</span>
@@ -138,93 +141,39 @@ export default function Home() {
       <header style={{ 
         display: "flex", 
         justifyContent: "space-between", 
-        alignItems: "flex-start",
-        marginBottom: "24px" /* Reduced from 48px */
+        alignItems: "center",
+        marginBottom: "32px"
       }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <LayoutDashboard size={20} style={{ color: "var(--accent-primary)" }} />
-            <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-              Workspace Dashboard
-            </span>
-          </div>
-          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "4px" }}>
-            Greetings, {session.user?.name?.split(" ")[0]} 🌌
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: "1.75rem", fontWeight: 800, marginBottom: "4px", color: "var(--text-primary)" }}>
+            Greetings, {session.user?.name?.split(" ")[0] || "Tim"}
           </h1>
-          <p style={{ color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "8px", fontSize: "0.85rem" }}>
-            {!session?.accessToken && (
-              <span style={{ 
-                background: "rgba(251, 191, 36, 0.1)", 
-                color: "var(--accent-amber)", 
-                padding: "2px 8px", 
-                borderRadius: "4px", 
-                fontSize: "0.7rem",
-                fontWeight: 600
-              }}>
-                MOCK MODE ACTIVE
-              </span>
-            )}
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+            You have 4 upcoming tasks for today and 2 unread emails.
           </p>
         </div>
-
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button 
-            onClick={handleRefreshAll}
-            disabled={isRefreshing}
-            className="glass-card" 
-            style={{ 
-              padding: "10px", 
-              borderRadius: "12px", 
-              color: isRefreshing ? "var(--accent-primary)" : "var(--text-secondary)",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              opacity: isRefreshing ? 0.7 : 1,
-              transition: "all 0.3s ease",
-              cursor: isRefreshing ? "default" : "pointer"
-            }}
-          >
-            <RefreshCw 
-              size={18} 
-              className={isRefreshing ? "animate-spin" : ""} 
-              style={{ transition: "all 0.5s ease" }}
-            />
-            <span style={{ fontSize: "0.85rem", fontWeight: 500 }}>
-              {isRefreshing ? "Syncing..." : "Refresh All"}
-            </span>
-          </button>
-          
+        <div style={{ display: "flex", alignItems: "center" }}>
           <button 
             onClick={() => window.open('https://app.nowsta.com/', '_blank')}
-            className="glass-card" 
+            className="glass-card hover-opacity" 
             style={{ 
               padding: "10px 16px", 
               borderRadius: "12px", 
-              color: "var(--accent-cyan)",
+              color: "var(--accent-primary)",
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              border: "1px solid var(--accent-cyan)"
+              border: "1px solid var(--glass-border)",
+              background: "#fff",
+              cursor: "pointer"
             }}
           >
             <ExternalLink size={18} />
             <span style={{ fontSize: "0.85rem", fontWeight: 700 }}>Nowsta Portal</span>
           </button>
-          <button 
-            onClick={() => signOut()}
-            className="glass-card" 
-            style={{ 
-              padding: "10px", 
-              borderRadius: "12px", 
-              color: "var(--accent-rose)",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px"
-            }}
-          >
-            <LogOut size={18} />
-          </button>
         </div>
+
+
       </header>
 
       {/* Widget Grid - 3 Column Layout */}

@@ -74,7 +74,7 @@ export default function GmailMessageDetail({ messageId, onBack }: GmailMessageDe
   if (!details) {
     return (
       <div style={{ padding: "20px" }}>
-        <button onClick={onBack} style={{ background: "transparent", color: "white", marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
+        <button onClick={onBack} style={{ background: "transparent", color: "var(--text-primary)", marginBottom: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
           <ArrowLeft size={16} /> Back
         </button>
         <p style={{ color: "#fca5a5", fontSize: "0.85rem" }}>Failed to load message details.</p>
@@ -120,7 +120,7 @@ export default function GmailMessageDetail({ messageId, onBack }: GmailMessageDe
 
       {/* Email Header Info */}
       <div style={{ marginBottom: "20px", borderBottom: "1px solid var(--glass-border)", paddingBottom: "16px", flexShrink: 0 }}>
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, color: "white", marginBottom: "12px", lineHeight: 1.3 }}>{details.subject}</h2>
+        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "12px", lineHeight: 1.3 }}>{details.subject}</h2>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px" }}>
           <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis" }}>
             {details.from}

@@ -118,7 +118,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
       {/* Input & Search */}
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
         <form onSubmit={handleAddTask} style={{ display: "flex", gap: "8px" }}>
-          <input type="text" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Quick add to My Tasks..." style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "8px 12px", color: "white", fontSize: "0.85rem", outline: "none" }} />
+          <input type="text" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Quick add to My Tasks..." style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "8px 12px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none" }} />
           <button type="submit" disabled={isAdding || !newTaskTitle.trim()} style={{ background: "var(--accent-secondary)", color: "white", width: "36px", height: "36px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", opacity: (isAdding || !newTaskTitle.trim()) ? 0.5 : 1 }}>
             {isAdding ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
           </button>
@@ -126,7 +126,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
 
         <div style={{ position: "relative" }}>
           <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search tasks or lists..." style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "8px 12px 8px 34px", color: "white", fontSize: "0.8rem", outline: "none" }} />
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search tasks or lists..." style={{ width: "100%", background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "8px 12px 8px 34px", color: "var(--text-primary)", fontSize: "0.8rem", outline: "none" }} />
         </div>
       </div>
 
@@ -156,7 +156,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
                       if (e.key === 'Enter') handleEditSave(task.id, task.listId);
                       if (e.key === 'Escape') setEditingTaskId(null);
                     }}
-                    style={{ flex: 1, background: "rgba(255,255,255,0.1)", border: "1px solid var(--accent-secondary)", borderRadius: "6px", padding: "4px 8px", color: "white", fontSize: "0.85rem", outline: "none", minWidth: 0 }}
+                    style={{ flex: 1, background: "rgba(255,255,255,0.1)", border: "1px solid var(--accent-secondary)", borderRadius: "6px", padding: "4px 8px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", minWidth: 0 }}
                   />
                   <button onClick={() => setEditingTaskId(null)} disabled={isProcessing} style={{ background: "transparent", color: "var(--text-muted)", cursor: "pointer" }}><X size={14} /></button>
                   <button onClick={() => handleEditSave(task.id, task.listId)} disabled={isProcessing} style={{ background: "var(--accent-secondary)", color: "black", padding: "4px 8px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, cursor: isProcessing ? "wait" : "pointer" }}>

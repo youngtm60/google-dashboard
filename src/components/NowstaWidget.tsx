@@ -56,7 +56,7 @@ export default function NowstaWidget() {
       <div style={{ 
         marginTop: "24px", 
         padding: "12px", 
-        background: "rgba(255,255,255,0.03)", 
+        background: "var(--bg-deep)", 
         borderRadius: "12px", 
         border: "1px solid var(--glass-border)",
         display: "flex",

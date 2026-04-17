@@ -162,7 +162,7 @@ export default function CalendarWidget() {
       </div>
 
       {isSettingsOpen && (
-        <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "16px", border: "1px solid var(--glass-border)" }} className="animate-fade-in">
+        <div style={{ background: "var(--glass-border)", borderRadius: "12px", padding: "12px", marginBottom: "16px", border: "1px solid var(--glass-border)" }} className="animate-fade-in">
           <h4 style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "10px", fontWeight: 600 }}>Caldendars in View</h4>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "150px", overflowY: "auto" }} className="custom-scrollbar">
             {calendarList.length === 0 ? (
@@ -219,9 +219,9 @@ export default function CalendarWidget() {
           </p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {filteredEvents.map((event) => (
+            {filteredEvents.map((event, index) => (
               <div 
-                key={event.id}
+                key={`${event.id}-${index}`}
                 onClick={() => setActiveEventId(event.id)}
                 className="glass-card hover-opacity"
                 style={{ 

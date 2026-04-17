@@ -65,7 +65,7 @@ export default function TodayWidget() {
           style={{
             flex: 1,
             width: "100%",
-            background: "rgba(255,255,255,0.03)",
+            background: "var(--bg-deep)",
             border: "1px solid var(--glass-border)",
             borderRadius: "16px",
             padding: "16px",

@@ -14,7 +14,9 @@ import {
   Notebook,
   Edit3,
   Briefcase,
-  Calendar
+  Calendar,
+  Layers,
+  Bell
 } from "lucide-react";
 
 const navItems = [
@@ -34,7 +36,7 @@ export default function Sidebar() {
   if (!session) return null;
 
   return (
-    <aside className="glass-panel" style={{
+    <aside style={{
       width: "var(--sidebar-width)",
       height: "100vh",
       position: "fixed",
@@ -42,15 +44,31 @@ export default function Sidebar() {
       top: 0,
       display: "flex",
       flexDirection: "column",
-      padding: "32px 12px",
-      zIndex: 50
+      padding: "32px 20px",
+      zIndex: 50,
+      background: "var(--glass-bg)",
+      borderRight: "1px solid var(--glass-border)",
     }}>
-      <div style={{ marginBottom: "48px", padding: "0 12px" }}>
-        <h2 className="accent-text-gradient" style={{ fontSize: "1.25rem", fontWeight: 800 }}>Nebula</h2>
-        <p style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>Workspace</p>
+      <div style={{ marginBottom: "48px", display: "flex", alignItems: "center", gap: "12px" }}>
+        <div style={{ 
+          background: "var(--accent-primary)", 
+          width: "36px", 
+          height: "36px", 
+          borderRadius: "8px", 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center",
+          color: "white" 
+        }}>
+          <Layers size={20} />
+        </div>
+        <div>
+          <h2 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)" }}>Digital Planner</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.75rem", fontWeight: 500 }}>Cloud Workspace</p>
+        </div>
       </div>
 
-      <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+      <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "4px" }}>
         {navItems.map((item, index) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -59,48 +77,31 @@ export default function Sidebar() {
             <Link 
               key={item.href} 
               href={item.href}
-              className="glass-card"
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "10px",
-                padding: "12px 14px",
-                borderRadius: "14px",
-                color: isActive ? "white" : "var(--text-secondary)",
-                borderLeft: isActive ? `3px solid ${item.color}` : "1px solid var(--glass-border)",
-                background: isActive ? `linear-gradient(90deg, ${item.color}15 0%, transparent 100%)` : "transparent",
-                transition: "all 0.3s ease",
-                position: "relative",
-                overflow: "hidden"
+                gap: "12px",
+                padding: "10px 14px",
+                borderRadius: "8px",
+                color: isActive ? item.color : "var(--text-secondary)",
+                background: isActive ? `rgba(107, 90, 237, 0.08)` : "transparent",
+                transition: "all 0.2s ease",
+                textDecoration: "none"
               }}
             >
               <Icon 
                 size={18} 
                 style={{ 
-                  color: item.color,
-                  opacity: isActive ? 1 : 0.7,
-                  filter: isActive ? `drop-shadow(0 0 8px ${item.color}44)` : "none"
+                  color: isActive ? item.color : "var(--text-secondary)",
                 }} 
               />
               <span style={{ 
-                fontWeight: isActive ? 700 : 500, 
-                fontSize: "0.85rem",
-                color: isActive ? "white" : "var(--text-secondary)"
+                fontWeight: isActive ? 600 : 500, 
+                fontSize: "0.9rem",
+                color: isActive ? item.color : "var(--text-secondary)"
               }}>
                 {item.label}
               </span>
-              
-              {isActive && (
-                <div style={{
-                  position: "absolute",
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: "100%",
-                  background: `linear-gradient(90deg, ${item.color}10 0%, transparent 100%)`,
-                  pointerEvents: "none"
-                }} />
-              )}
             </Link>
           );
         })}
@@ -112,33 +113,35 @@ export default function Sidebar() {
           alignItems: "center", 
           gap: "12px", 
           padding: "12px",
-          borderTop: "1px solid var(--glass-border)"
+          background: "#f8fafc",
+          borderRadius: "12px",
+          border: "1px solid var(--glass-border)"
         }}>
           {session.user?.image ? (
             <img 
               src={session.user.image} 
               alt="Profile" 
-              style={{ width: "30px", height: "30px", borderRadius: "50%" }} 
+              style={{ width: "36px", height: "36px", borderRadius: "8px" }} 
             />
           ) : (
             <div style={{ 
-              width: "30px", 
-              height: "30px", 
-              borderRadius: "50%", 
+              width: "36px", 
+              height: "36px", 
+              borderRadius: "8px", 
               background: "var(--glass-highlight)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center"
             }}>
-              <User size={16} color="var(--text-muted)" />
+              <User size={18} color="var(--text-muted)" />
             </div>
           )}
-          <div style={{ overflow: "hidden" }}>
-            <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {session.user?.name}
+          <div style={{ overflow: "hidden", flex: 1 }}>
+            <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {session.user?.name || "Tim Atelier"}
             </p>
-            <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {session.user?.email}
+            <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              Premium Plan
             </p>
           </div>
         </div>
@@ -149,15 +152,15 @@ export default function Sidebar() {
             display: "flex",
             alignItems: "center",
             gap: "12px",
-            padding: "12px 16px",
-            color: "var(--accent-rose)",
+            padding: "10px 16px",
+            color: "var(--text-secondary)",
             width: "100%",
-            borderRadius: "12px"
+            borderRadius: "8px",
+            background: "transparent"
           }}
-          className="glass-card"
         >
-          <LogOut size={20} />
-          <span style={{ fontWeight: 500 }}>Sign Out</span>
+          <LogOut size={18} />
+          <span style={{ fontWeight: 500, fontSize: "0.9rem" }}>Sign Out</span>
         </button>
       </div>
     </aside>

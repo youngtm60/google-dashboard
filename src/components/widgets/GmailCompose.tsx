@@ -117,7 +117,7 @@ export default function GmailCompose({ onBack }: GmailComposeProps) {
               onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
               placeholder="Name or recipient@example.com"
               required
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "10px 14px", color: "white", fontSize: "0.85rem", outline: "none", width: "100%" }}
+              style={{ background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%" }}
             />
             {isLoadingContacts && (
                <Loader2 size={14} className="animate-spin" style={{ position: "absolute", right: "12px", top: "36px", color: "var(--text-muted)" }} />
@@ -152,7 +152,7 @@ export default function GmailCompose({ onBack }: GmailComposeProps) {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Meeting agenda..."
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "10px 14px", color: "white", fontSize: "0.85rem", outline: "none", width: "100%" }}
+              style={{ background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%" }}
             />
           </div>
 
@@ -163,7 +163,7 @@ export default function GmailCompose({ onBack }: GmailComposeProps) {
               onChange={(e) => setBody(e.target.value)}
               required
               placeholder="Hi there,"
-              style={{ flex: 1, minHeight: "200px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "12px 14px", color: "white", fontSize: "0.85rem", outline: "none", width: "100%", resize: "none" }}
+              style={{ flex: 1, minHeight: "200px", background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "12px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%", resize: "none" }}
             />
           </div>
 

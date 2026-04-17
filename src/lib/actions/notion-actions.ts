@@ -76,3 +76,67 @@ export async function updateNotionBlock(blockId: string, text: string, type: str
     return { success: false, error: error.message };
   }
 }
+
+
+export async function createNotionPage(title: string, notebook: string = 'Personal') {
+  const personalId = process.env.NOTION_PERSONAL_ID;
+  const byuId = process.env.NOTION_BYU_NOTES_ID;
+
+  if (!notionToken) {
+    // Mock implementation
+    const newId = 'mock-page-' + Date.now();
+    MOCK_NOTION_PAGES.unshift({
+      id: newId,
+      title: title,
+      notebook: notebook,
+      lastEdited: new Date().toISOString(),
+      url: '#',
+      icon: '📄'
+    });
+    MOCK_NOTION_CONTENT[newId] = [
+      { id: 'block-1', type: 'paragraph', text: '' }
+    ];
+    return { success: true, pageId: newId };
+  }
+
+  try {
+    const parentId = notebook === 'BYU Notes' ? byuId : personalId;
+    if (!parentId) {
+      return { success: false, error: `No parent ID configured for ${notebook}` };
+    }
+
+    const response = await notion.pages.create({
+      parent: { type: 'database_id', database_id: parentId },
+      properties: {
+        Name: { // Assumes database has 'Name' title property
+          title: [
+            { text: { content: title } }
+          ]
+        }
+      }
+    });
+
+    return { success: true, pageId: response.id };
+  } catch (error: any) {
+    // If parent is a page instead of database, we might need parent: { type: 'page_id', page_id: parentId }
+    // Let's try page_id fallback if database_id fails
+    try {
+      const parentId = notebook === 'BYU Notes' ? byuId : personalId;
+      if (!parentId) throw new Error("No parent ID");
+      const response = await notion.pages.create({
+        parent: { type: 'page_id', page_id: parentId },
+        properties: {
+          title: {
+            title: [
+              { text: { content: title } }
+            ]
+          }
+        }
+      });
+      return { success: true, pageId: response.id };
+    } catch (fallbackError: any) {
+      console.error('Failed to create Notion page:', fallbackError);
+      return { success: false, error: fallbackError.message };
+    }
+  }
+}
