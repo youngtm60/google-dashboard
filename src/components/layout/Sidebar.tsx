@@ -48,6 +48,7 @@ export default function Sidebar() {
       zIndex: 50,
       background: "var(--glass-bg)",
       borderRight: "1px solid var(--glass-border)",
+      overflowY: "auto",
     }}>
       <div style={{ marginBottom: "48px", display: "flex", alignItems: "center", gap: "12px" }}>
         <div style={{ 

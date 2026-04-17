@@ -102,7 +102,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
   const finalTasks = viewMode === 'recent' ? displayTasks.slice(0, 10) : displayTasks;
 
   return (
-    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: "350px" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-secondary)" }}>
