@@ -11,7 +11,7 @@ export default function NowstaWidget() {
     <section className="glass-panel" style={{ 
       padding: "24px", 
       borderRadius: "24px", 
-      height: "100%", 
+      flex: 1, 
       display: "flex", 
       flexDirection: "column",
       justifyContent: "center",

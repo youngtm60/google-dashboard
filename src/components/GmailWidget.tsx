@@ -29,7 +29,7 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
   // Render Sub-Views If Active
   if (isComposing) {
     return (
-      <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: "350px", height: "100%", display: "flex", flexDirection: "column" }}>
+      <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: "350px", flex: 1, display: "flex", flexDirection: "column" }}>
         <GmailCompose onBack={() => setIsComposing(false)} />
       </section>
     );
@@ -37,7 +37,7 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
 
   if (selectedMessageId) {
     return (
-      <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: "350px", height: "100%", display: "flex", flexDirection: "column" }}>
+      <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: "350px", flex: 1, display: "flex", flexDirection: "column" }}>
         <GmailMessageDetail messageId={selectedMessageId} onBack={() => setSelectedMessageId(null)} />
       </section>
     );
@@ -54,7 +54,7 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
   });
 
   return (
-    <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: "350px", height: "100%", display: "flex", flexDirection: "column" }}>
+    <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: "350px", flex: 1, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
           <Mail size={20} />

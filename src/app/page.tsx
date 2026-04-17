@@ -178,11 +178,9 @@ export default function Home() {
 
       {/* Widget Grid - 3 Column Layout */}
       <div style={{ 
-        flex: 1, 
         display: "flex", 
         gap: "24px",
-        marginBottom: "0px",
-        minHeight: "750px"
+        marginBottom: "0px"
       }}>
         {/* Left Column (Today + Tasks) */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
@@ -192,19 +190,13 @@ export default function Home() {
 
         {/* Center Column (Notes + Calendar) */}
         <div style={{ flex: 1.2, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <NotionWidget />
-          </div>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <CalendarWidget />
-          </div>
+          <NotionWidget />
+          <CalendarWidget />
         </div>
 
         {/* Right Column (Gmail + Drive) */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <GmailWidget limit={10} />
-          </div>
+          <GmailWidget limit={10} />
           <DriveWidget />
         </div>
       </div>

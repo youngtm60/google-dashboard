@@ -32,7 +32,7 @@ export default function DriveWidget() {
     });
 
   return (
-    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", minHeight: "300px", maxHeight: "400px", height: "100%", display: "flex", flexDirection: "column" }}>
+    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", minHeight: "300px", maxHeight: "400px", flex: 1, display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-emerald)" }}>
           <Cloud size={20} />

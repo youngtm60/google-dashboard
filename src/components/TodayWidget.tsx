@@ -66,7 +66,7 @@ export default function TodayWidget() {
       borderRadius: "24px", 
       minHeight: "300px", 
       maxHeight: "400px", 
-      height: "100%", 
+      flex: 1, 
       display: "flex", 
       flexDirection: "column" 
     }}>
