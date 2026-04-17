@@ -17,6 +17,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
+  const [sortBy, setSortBy] = useState<'date' | 'alpha'>('date');
   
   // States for actions
   const [isAdding, setIsAdding] = useState(false);
@@ -81,10 +82,21 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
   if (isLoading) return <WidgetSkeleton />;
 
   // Filter and Search logic
-  const displayTasks = (tasks?.filter((t: any) => t.status !== 'completed') || []).filter((task: any) => {
+  let displayTasks = (tasks?.filter((t: any) => t.status !== 'completed') || []).filter((task: any) => {
     const query = searchQuery.toLowerCase();
     return task.title.toLowerCase().includes(query) || 
            (task.listName && task.listName.toLowerCase().includes(query));
+  });
+
+  // Apply sorting
+  displayTasks = [...displayTasks].sort((a: any, b: any) => {
+    if (sortBy === 'alpha') {
+      return a.title.localeCompare(b.title);
+    } else {
+      const timeA = a.due ? new Date(a.due).getTime() : (a.updated ? new Date(a.updated).getTime() : 0);
+      const timeB = b.due ? new Date(b.due).getTime() : (b.updated ? new Date(b.updated).getTime() : 0);
+      return timeB - timeA;
+    }
   });
 
   const finalTasks = viewMode === 'recent' ? displayTasks.slice(0, 10) : displayTasks;
@@ -98,20 +110,36 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
           <h3 style={{ fontWeight: 600, fontSize: "0.95rem" }}>Tasks</h3>
         </div>
         
-        {/* View Mode Toggle */}
-        <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
-          <button 
-            onClick={() => { setViewMode('recent'); setSearchQuery(''); }}
-            style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'recent' ? "var(--accent-secondary)" : "transparent", color: viewMode === 'recent' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
-          >
-            Recent
-          </button>
-          <button 
-            onClick={() => { setViewMode('all'); setSearchQuery(''); }}
-            style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'all' ? "var(--accent-secondary)" : "transparent", color: viewMode === 'all' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
-          >
-            All
-          </button>
+        {/* Sort & View Mode Toggles */}
+        <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
+            <button 
+              onClick={() => setSortBy('date')}
+              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'date' ? "var(--accent-secondary)" : "transparent", color: sortBy === 'date' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+            >
+              Date
+            </button>
+            <button 
+              onClick={() => setSortBy('alpha')}
+              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'alpha' ? "var(--accent-secondary)" : "transparent", color: sortBy === 'alpha' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+            >
+              A-Z
+            </button>
+          </div>
+          <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
+            <button 
+              onClick={() => { setViewMode('recent'); setSearchQuery(''); }}
+              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'recent' ? "var(--accent-secondary)" : "transparent", color: viewMode === 'recent' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+            >
+              Recent
+            </button>
+            <button 
+              onClick={() => { setViewMode('all'); setSearchQuery(''); }}
+              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'all' ? "var(--accent-secondary)" : "transparent", color: viewMode === 'all' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+            >
+              All
+            </button>
+          </div>
         </div>
       </div>
 
