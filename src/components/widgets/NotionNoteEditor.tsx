@@ -121,7 +121,7 @@ export default function NotionNoteEditor({ note, onBack }: NotionNoteEditorProps
       setIsLoading(true);
       const res = await getNotionPageBlocks(currentNote.id);
       if (res.success) {
-        setBlocks(res.blocks);
+        setBlocks(res.blocks || []);
       }
       setIsLoading(false);
     }

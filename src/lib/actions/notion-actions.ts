@@ -1,7 +1,7 @@
 'use server';
 
 import { Client } from '@notionhq/client';
-import { MOCK_NOTION_CONTENT } from '../mock-data';
+import { MOCK_NOTION_CONTENT, MOCK_NOTION_PAGES } from '../mock-data';
 
 const notionToken = process.env.NOTION_INTEGRATION_TOKEN;
 const notion = new Client({ auth: notionToken });
