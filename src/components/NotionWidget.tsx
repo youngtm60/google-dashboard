@@ -69,7 +69,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
 
     if (activeNote) {
       return (
-        <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: "350px" }}>
+        <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", minHeight: "350px" }}>
           <NotionNoteEditor 
             note={activeNote} 
             onBack={() => {
@@ -83,7 +83,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
   }
 
   return (
-    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: "350px" }}>
+    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", minHeight: "350px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-amber)" }}>
           <Notebook size={20} />

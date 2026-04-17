@@ -109,7 +109,7 @@ export default function CalendarWidget() {
 
   if (isCreating) {
     return (
-      <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", flex: 1, minHeight: "350px", display: "flex", flexDirection: "column" }}>
+      <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", minHeight: "350px", display: "flex", flexDirection: "column" }}>
         <CalendarEventCreate onBack={() => setIsCreating(false)} onSuccess={() => setIsCreating(false)} />
       </section>
     );
@@ -119,7 +119,7 @@ export default function CalendarWidget() {
     const activeEvent = events.find((e: CalendarEvent) => e.id === activeEventId);
     if (activeEvent) {
       return (
-        <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", flex: 1, minHeight: "350px", display: "flex", flexDirection: "column" }}>
+        <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", minHeight: "350px", display: "flex", flexDirection: "column" }}>
           <CalendarEventDetail event={activeEvent} onBack={() => setActiveEventId(null)} />
         </section>
       );
@@ -128,7 +128,7 @@ export default function CalendarWidget() {
 
   return (
     <section className="glass-panel animate-fade-in" style={{ 
-      padding: "20px", borderRadius: "24px", flex: 1, minHeight: "350px", display: "flex", flexDirection: "column" 
+      padding: "20px", borderRadius: "24px", minHeight: "350px", display: "flex", flexDirection: "column" 
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-sky)" }}>
