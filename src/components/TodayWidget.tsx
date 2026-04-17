@@ -2,26 +2,60 @@
 
 import { useState, useEffect } from 'react';
 import { Edit3, Trash2 } from 'lucide-react';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function TodayWidget() {
+  const { data, error, isLoading } = useSWR('/api/today', fetcher);
   const [notes, setNotes] = useState('');
   const [isMounted, setIsMounted] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
-  // Persistence logic
+  // Load initial notes from API
   useEffect(() => {
-    const savedNotes = localStorage.getItem('nebula_today_notes');
-    if (savedNotes) setNotes(savedNotes);
-    setIsMounted(true);
-  }, []);
+    if (data?.notes !== undefined && !isMounted) {
+      setNotes(data.notes);
+      setIsMounted(true);
+    } else if (data?.fallback && !isMounted) {
+      // Local development fallback
+      const savedNotes = localStorage.getItem('nebula_today_notes');
+      if (savedNotes) setNotes(savedNotes);
+      setIsMounted(true);
+    }
+  }, [data, isMounted]);
 
+  // Debounced save
   useEffect(() => {
-    if (isMounted) {
+    if (!isMounted) return;
+
+    setSaveStatus('saving');
+    
+    // If fallback is active, also save to local storage
+    if (data?.fallback) {
       localStorage.setItem('nebula_today_notes', notes);
     }
-  }, [notes, isMounted]);
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        await fetch('/api/today', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notes }),
+        });
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
+      } catch (error) {
+        console.error('Failed to save notes:', error);
+        setSaveStatus('idle');
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [notes, isMounted, data?.fallback]);
 
   const clearNotes = () => {
-    if (confirm('Clear Today\'s notes?')) {
+    if (confirm("Clear Today's notes?")) {
       setNotes('');
     }
   };
@@ -61,7 +95,8 @@ export default function TodayWidget() {
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="What's on your mind today? Type here for quick, persistent notes..."
+          placeholder={isLoading ? "Loading your notes..." : "What's on your mind today? Type here for quick, persistent notes..."}
+          disabled={isLoading}
           style={{
             flex: 1,
             width: "100%",
@@ -75,17 +110,23 @@ export default function TodayWidget() {
             resize: "none",
             outline: "none",
             fontFamily: "inherit",
-            transition: "all 0.3s ease"
+            transition: "all 0.3s ease",
+            opacity: isLoading ? 0.6 : 1
           }}
           onFocus={(e) => e.target.style.borderColor = "var(--accent-rose)"}
           onBlur={(e) => e.target.style.borderColor = "var(--glass-border)"}
         />
       </div>
 
-      <div style={{ marginTop: "12px", borderTop: "1px solid var(--glass-border)", paddingTop: "12px" }}>
+      <div style={{ marginTop: "12px", borderTop: "1px solid var(--glass-border)", paddingTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontStyle: "italic" }}>
-          * Notes are persistent and stored locally on this device.
+          * Notes are persistent across your devices securely.
         </p>
+        {isMounted && (
+          <span style={{ fontSize: "0.65rem", color: saveStatus === 'saving' ? "var(--accent-secondary)" : "var(--text-muted)", fontWeight: 600 }}>
+            {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Synced' : ''}
+          </span>
+        )}
       </div>
     </section>
   );
