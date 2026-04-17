@@ -180,20 +180,20 @@ export default function Home() {
       <div style={{ 
         flex: 1, 
         display: "flex", 
+        flexWrap: "wrap",
         gap: "24px", 
-        minHeight: 0, 
-        height: "100%",
-        marginBottom: "0px",
-        overflow: "hidden"
+        minHeight: "min-content", 
+        height: "auto",
+        marginBottom: "40px"
       }}>
         {/* Left Column (Today + Tasks) */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: "320px", height: "auto" }}>
           <TodayWidget />
           <TasksWidget />
         </div>
 
         {/* Center Column (Notes + Calendar) */}
-        <div style={{ flex: 1.2, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, height: "100%" }}>
+        <div style={{ flex: 1.2, display: "flex", flexDirection: "column", gap: "16px", minWidth: "320px", height: "auto" }}>
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
             <NotionWidget />
           </div>
@@ -203,7 +203,7 @@ export default function Home() {
         </div>
 
         {/* Right Column (Gmail + Drive) */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, height: "100%" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: "320px", height: "auto" }}>
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
             <GmailWidget limit={10} />
           </div>
