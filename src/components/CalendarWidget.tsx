@@ -64,7 +64,7 @@ export default function CalendarWidget() {
   const loadCalendars = async () => {
     const res = await fetchCalendarList();
     if (res.success && res.calendars) {
-      setCalendarList(res.calendars);
+      setCalendarList(res.calendars as CalendarInfo[]);
     }
   };
 

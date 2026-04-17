@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const calendars = calendarsParam ? calendarsParam.split(',') : ['primary'];
 
   try {
-    const events = await getGoogleCalendarEvents(session.accessToken as string, maxResults, calendars);
+    const events = await getGoogleCalendarEvents((session as any).accessToken as string, maxResults, calendars);
     return NextResponse.json(events);
   } catch (error: any) {
     const errMsg = error?.message || String(error) || 'Failed to fetch calendar events';
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields (summary, start, end)' }, { status: 400 });
     }
 
-    const newEvent = await createGoogleCalendarEvent(session.accessToken as string, body);
+    const newEvent = await createGoogleCalendarEvent((session as any).accessToken as string, body);
     return NextResponse.json(newEvent, { status: 201 });
   } catch (error: any) {
     const errMsg = error?.message || String(error) || 'Failed to create calendar event';
@@ -61,7 +61,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Missing required fields (summary, start, end)' }, { status: 400 });
     }
 
-    const updatedEvent = await updateGoogleCalendarEvent(session.accessToken as string, eventId, body);
+    const updatedEvent = await updateGoogleCalendarEvent((session as any).accessToken as string, eventId, body);
     return NextResponse.json(updatedEvent, { status: 200 });
   } catch (error: any) {
     const errMsg = error?.message || String(error) || 'Failed to update calendar event';
@@ -79,7 +79,7 @@ export async function DELETE(request: Request) {
     const eventId = searchParams.get('eventId');
     if (!eventId) return NextResponse.json({ error: 'Missing eventId parameter' }, { status: 400 });
 
-    const result = await deleteGoogleCalendarEvent(session.accessToken as string, eventId);
+    const result = await deleteGoogleCalendarEvent((session as any).accessToken as string, eventId);
     return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
     const errMsg = error?.message || String(error) || 'Failed to delete calendar event';
