@@ -181,7 +181,8 @@ export default function Home() {
         flex: 1, 
         display: "flex", 
         gap: "24px",
-        marginBottom: "0px"
+        marginBottom: "0px",
+        minHeight: "750px"
       }}>
         {/* Left Column (Today + Tasks) */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
