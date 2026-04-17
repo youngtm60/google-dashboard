@@ -28,7 +28,8 @@ export default function RootLayout({
               padding: "40px",
               width: "100%",
               height: "100vh",
-              overflow: "hidden"
+              overflowY: "auto",
+              overflowX: "hidden"
             }}>
               {children}
             </main>

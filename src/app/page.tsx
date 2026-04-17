@@ -137,7 +137,7 @@ export default function Home() {
   }
 
   return (
-    <div className="animate-fade-in" style={{ height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
+    <div className="animate-fade-in" style={{ minHeight: "100%", display: "flex", flexDirection: "column" }}>
       <header style={{ 
         display: "flex", 
         justifyContent: "space-between", 
@@ -180,11 +180,8 @@ export default function Home() {
       <div style={{ 
         flex: 1, 
         display: "flex", 
-        gap: "24px", 
-        minHeight: 0, 
-        height: "100%",
-        marginBottom: "0px",
-        overflow: "hidden"
+        gap: "24px",
+        marginBottom: "0px"
       }}>
         {/* Left Column (Today + Tasks) */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
@@ -193,18 +190,18 @@ export default function Home() {
         </div>
 
         {/* Center Column (Notes + Calendar) */}
-        <div style={{ flex: 1.2, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, height: "100%" }}>
-          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ flex: 1.2, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <NotionWidget />
           </div>
-          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <CalendarWidget />
           </div>
         </div>
 
         {/* Right Column (Gmail + Drive) */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, height: "100%" }}>
-          <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <GmailWidget limit={10} />
           </div>
           <DriveWidget />
