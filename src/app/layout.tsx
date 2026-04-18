@@ -22,15 +22,7 @@ export default function RootLayout({
         <SessionProvider>
           <div style={{ display: "flex", minHeight: "100vh" }}>
             <Sidebar />
-            <main style={{ 
-              flex: 1, 
-              marginLeft: "var(--sidebar-width)",
-              padding: "40px",
-              width: "100%",
-              height: "100vh",
-              overflowY: "auto",
-              overflowX: "hidden"
-            }}>
+            <main className="main-content">
               {children}
             </main>
           </div>

@@ -102,7 +102,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
   const finalTasks = viewMode === 'recent' ? displayTasks.slice(0, 10) : displayTasks;
 
   return (
-    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", minHeight: "350px" }}>
+    <section className="glass-panel" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-secondary)" }}>
@@ -160,8 +160,21 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
 
       {/* Task List */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", overflowY: "auto", maxHeight: maxHeight, paddingRight: "4px", width: "100%" }} className="custom-scrollbar">
-        {finalTasks.map((task: any) => (
-          <div key={task.id} className="glass-card hover-opacity" style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyItems: "space-between", gap: "12px", flexShrink: 0, width: "100%" }}>
+        {(() => {
+          const topLevelTasks = finalTasks.filter((t: any) => !t.parentId || !finalTasks.some((p: any) => p.id === t.parentId));
+          const subTasksByParent = finalTasks.reduce((acc: any, t: any) => {
+            if (t.parentId) {
+              if (!acc[t.parentId]) acc[t.parentId] = [];
+              acc[t.parentId].push(t);
+            }
+            return acc;
+          }, {});
+
+          const renderTaskNode = (task: any, level: number = 0) => {
+            const children = subTasksByParent[task.id] || [];
+            return (
+              <div key={task.id} style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
+                <div key={task.id} className="glass-card hover-opacity" style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyItems: "space-between", gap: "12px", flexShrink: 0, width: level > 0 ? `calc(100% - ${level * 24}px)` : "100%", marginLeft: level > 0 ? `${level * 24}px` : "0", borderLeft: level > 0 ? "3px solid var(--accent-secondary)" : undefined, opacity: level > 0 ? 0.9 : 1 }}>
             
             <button 
               onClick={() => toggleTask(task.id, task.listId, task.status)}
@@ -262,7 +275,13 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
             )}
 
           </div>
-        ))}
+                {children.map((child: any) => renderTaskNode(child, level + 1))}
+              </div>
+            );
+          };
+
+          return topLevelTasks.map((task: any) => renderTaskNode(task, 0));
+        })()}
 
         {finalTasks.length === 0 && (
           <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "40px 20px" }}>

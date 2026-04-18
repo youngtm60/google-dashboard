@@ -36,20 +36,7 @@ export default function Sidebar() {
   if (!session) return null;
 
   return (
-    <aside style={{
-      width: "var(--sidebar-width)",
-      height: "100vh",
-      position: "fixed",
-      left: 0,
-      top: 0,
-      display: "flex",
-      flexDirection: "column",
-      padding: "32px 20px",
-      zIndex: 50,
-      background: "var(--glass-bg)",
-      borderRight: "1px solid var(--glass-border)",
-      overflowY: "auto",
-    }}>
+    <aside className="sidebar-container">
       <div style={{ marginBottom: "48px", display: "flex", alignItems: "center", gap: "12px" }}>
         <div style={{ 
           background: "var(--accent-primary)", 

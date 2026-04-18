@@ -83,7 +83,8 @@ export async function getGoogleTasks(accessToken?: string) {
           due: task.due,
           updated: task.updated,
           listId: list.id,
-          listName: list.title
+          listName: list.title,
+          parentId: task.parent
         }));
       })
     );
