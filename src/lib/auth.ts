@@ -56,6 +56,14 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      const allowedEmail = process.env.ALLOWED_EMAIL;
+      if (allowedEmail && user.email !== allowedEmail) {
+        console.log(`Access denied for email: ${user.email}`);
+        return false;
+      }
+      return true;
+    },
     async jwt({ token, account }) {
       // Initial sign in
       if (account) {
