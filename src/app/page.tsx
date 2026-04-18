@@ -11,25 +11,14 @@ export default function Home() {
     <div className="animate-fade-in" style={{ minHeight: "100%", paddingBottom: "40px" }}>
       <DashboardHeader />
 
-      {/* Widget Grid - 3 Column Layout using CSS Grid */}
+      {/* Widget Grid - Flat Layout using CSS Grid for auto wrapping */}
       <div className="dashboard-grid">
-        {/* Left Column (Today + Tasks) */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          <TodayWidget />
-          <TasksWidget />
-        </div>
-
-        {/* Center Column (Notes + Calendar) */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          <NotionWidget />
-          <CalendarWidget />
-        </div>
-
-        {/* Right Column (Gmail + Drive) */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          <GmailWidget limit={10} />
-          <DriveWidget />
-        </div>
+        <TodayWidget />
+        <NotionWidget />
+        <GmailWidget limit={10} />
+        <TasksWidget />
+        <CalendarWidget />
+        <DriveWidget />
       </div>
     </div>
   );

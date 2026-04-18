@@ -175,6 +175,6 @@ button {
   }
 }
 
-.dashboard-grid > div {
+.dashboard-grid > * {
   min-width: 340px;
 }
