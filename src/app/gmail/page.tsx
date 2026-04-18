@@ -3,38 +3,22 @@
 import GmailWidget from "@/components/GmailWidget";
 import { ArrowLeft, Mail } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default function GmailPage() {
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: "100px" }}>
-      <header style={{ marginBottom: "40px" }}>
-        <Link 
-          href="/" 
-          style={{ 
-            display: "inline-flex", 
-            alignItems: "center", 
-            gap: "8px", 
-            color: "var(--text-muted)",
-            fontSize: "0.9rem",
-            marginBottom: "16px",
-            textDecoration: "none"
-          }}
-          className="hover-opacity"
-        >
-          <ArrowLeft size={16} />
-          Back to Dashboard
-        </Link>
+    <div className="animate-fade-in" style={{ paddingBottom: "100px", height: "100%", display: "flex", flexDirection: "column" }}>
+      <header style={{ marginBottom: "20px", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <Mail size={32} style={{ color: "var(--accent-primary)" }} />
-          <h1 style={{ fontSize: "2.5rem", fontWeight: 800, color: "var(--accent-primary)" }}>Gmail Overview</h1>
+          <h1 style={{ fontSize: "2.5rem", fontWeight: 800, color: "var(--accent-primary)" }}>Gmail</h1>
         </div>
-        <p style={{ color: "var(--text-secondary)", marginTop: "8px" }}>
-          Full view of your recent communications. Syncing in real-time.
-        </p>
       </header>
 
-      <div style={{ maxWidth: "1000px" }}>
-        <GmailWidget limit={20} />
+      <div style={{ flex: 1, width: "100%", height: "100%", minHeight: "600px" }}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <GmailWidget limit={50} fullPage={true} />
+        </Suspense>
       </div>
     </div>
   );

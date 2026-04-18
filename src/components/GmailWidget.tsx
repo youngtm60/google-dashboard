@@ -3,22 +3,24 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { Send, Clock, Mail, Search, Plus } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import WidgetSkeleton from './WidgetSkeleton';
 import GmailMessageDetail from './widgets/GmailMessageDetail';
 import GmailCompose from './widgets/GmailCompose';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function GmailWidget({ limit = 10 }: { limit?: number }) {
-    const [searchQuery, setSearchQuery] = useState('');
-  
-  // Navigation State
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: number, fullPage?: boolean }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlMessageId = searchParams?.get('messageId');
+
+  const [searchQuery, setSearchQuery] = useState('');
   const [isComposing, setIsComposing] = useState(false);
 
   // Use broader inbox fetch
   const gmailQuery = 'label:INBOX';
-  const fetchLimit = 50;
+  const fetchLimit = fullPage ? 50 : limit;
 
   const { data: messages, isLoading } = useSWR(`/api/workspace/gmail?limit=${fetchLimit}&q=${encodeURIComponent(gmailQuery)}`, fetcher, {
     refreshInterval: 1000 * 60 * 5,
@@ -26,19 +28,20 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
 
   if (isLoading) return <WidgetSkeleton />;
 
-  // Render Sub-Views If Active
-  if (isComposing) {
+  // Render Full Page Message Detail
+  if (fullPage && urlMessageId) {
     return (
-      <section className="glass-panel" style={{padding: "24px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
-        <GmailCompose onBack={() => setIsComposing(false)} />
+      <section className="glass-panel" style={{padding: "40px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "100%", minHeight: "600px"}}>
+        <GmailMessageDetail messageId={urlMessageId} onBack={() => router.push('/gmail')} />
       </section>
     );
   }
 
-  if (selectedMessageId) {
+  // Render Sub-Views If Active
+  if (isComposing) {
     return (
-      <section className="glass-panel" style={{padding: "24px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
-        <GmailMessageDetail messageId={selectedMessageId} onBack={() => setSelectedMessageId(null)} />
+      <section className="glass-panel" style={{padding: "24px", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullPage ? "100%" : "450px"}}>
+        <GmailCompose onBack={() => setIsComposing(false)} />
       </section>
     );
   }
@@ -53,12 +56,16 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
            msg.snippet.toLowerCase().includes(q);
   });
 
+  const handleEmailClick = (msgId: string) => {
+    router.push('/gmail?messageId=' + msgId);
+  };
+
   return (
-    <section className="glass-panel" style={{padding: "24px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
+    <section className="glass-panel" style={{padding: "24px", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullPage ? "100%" : "450px"}}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
-          <Mail size={20} />
-          <h3 style={{ fontWeight: 600 }}>Gmail Inbox</h3>
+          {!fullPage && <Mail size={20} />}
+          <h3 style={{ fontWeight: 600 }}>{!fullPage ? "Gmail Inbox" : "Inbox"}</h3>
           <button 
             onClick={() => setIsComposing(true)}
             className="hover-opacity"
@@ -80,15 +87,13 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
         </div>
         
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "none" /* hidden on mobile typically, let's keep it clean */ }}>
+          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "none" }}>
             {messages?.filter((m: any) => m.isUnread).length} Unread
           </span>
-
-
         </div>
       </div>
 
-      <div style={{ position: "relative", marginBottom: "20px" }}>
+      <div style={{ position: "relative", marginBottom: "20px", flexShrink: 0 }}>
         <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
         <input
           type="text"
@@ -122,7 +127,7 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
         {displayMessages.map((msg: any) => (
           <div 
             key={msg.id} 
-            onClick={() => setSelectedMessageId(msg.id)} // Launch detail view
+            onClick={() => handleEmailClick(msg.id)}
             className="glass-card hover-opacity" 
             style={{ 
               padding: "14px 16px", 

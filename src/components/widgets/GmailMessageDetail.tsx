@@ -85,35 +85,35 @@ export default function GmailMessageDetail({ messageId, onBack }: GmailMessageDe
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", overflow: "hidden" }}>
       {/* Top Action Bar */}
-      <div style={{ display: "flex", alignItems: "center", justifyItems: "space-between", marginBottom: "20px", width: "100%", flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyItems: "space-between", marginBottom: "24px", width: "100%", flexShrink: 0 }}>
         <button 
           onClick={onBack}
           className="hover-opacity"
-          style={{ background: "transparent", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px", fontSize: "0.8rem", fontWeight: 500 }}
+          style={{ background: "transparent", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "8px", fontSize: "0.95rem", fontWeight: 500, padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--glass-border)" }}
         >
-          <ArrowLeft size={18} /> Back
+          <ArrowLeft size={18} /> Back to Dashboard
         </button>
         
         <div style={{ flex: 1 }} />
         
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <button 
             onClick={() => handleAction('archive')}
             disabled={!!processingAction}
-            title="Archive"
             className="hover-opacity"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", borderRadius: "8px", width: "32px", height: "32px", color: "var(--text-primary)", opacity: processingAction ? 0.5 : 1 }}
+            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 16px", background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "var(--text-primary)", fontSize: "0.9rem", fontWeight: 500, opacity: processingAction ? 0.5 : 1 }}
           >
-            {processingAction === 'archive' ? <Loader2 size={14} className="animate-spin" /> : <Archive size={14} />}
+            {processingAction === 'archive' ? <Loader2 size={16} className="animate-spin" /> : <Archive size={16} />}
+            Archive
           </button>
           <button 
             onClick={() => { if(window.confirm("Move this message to the trash?")) handleAction('trash') }}
             disabled={!!processingAction}
-            title="Trash"
             className="hover-opacity"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "8px", width: "32px", height: "32px", color: "#fca5a5", opacity: processingAction ? 0.5 : 1 }}
+            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 16px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "8px", color: "#ef4444", fontSize: "0.9rem", fontWeight: 500, opacity: processingAction ? 0.5 : 1 }}
           >
-            {processingAction === 'trash' ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+            {processingAction === 'trash' ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+            Delete
           </button>
         </div>
       </div>
