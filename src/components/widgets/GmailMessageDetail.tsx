@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useSWRConfig } from 'swr';
-import { ArrowLeft, Trash2, Archive, Loader2, MailOpen } from 'lucide-react';
+import { ArrowLeft, Trash2, Archive, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getGmailMessageDetails, trashGmailMessage, archiveGmailMessage, markGmailAsRead } from '@/lib/actions/gmail-actions';
 
 interface GmailMessageDetailProps {
   messageId: string;
   onBack: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
 }
 
-export default function GmailMessageDetail({ messageId, onBack }: GmailMessageDetailProps) {
+export default function GmailMessageDetail({ messageId, onBack, onNext, onPrevious }: GmailMessageDetailProps) {
   const { mutate } = useSWRConfig();
   const [details, setDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -97,6 +99,27 @@ export default function GmailMessageDetail({ messageId, onBack }: GmailMessageDe
         <div style={{ flex: 1 }} />
         
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "4px", marginRight: "12px" }}>
+            <button 
+              onClick={onPrevious}
+              disabled={!onPrevious}
+              className="hover-opacity"
+              title="Newer Email"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "8px", background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "var(--text-primary)", opacity: !onPrevious ? 0.3 : 1, cursor: !onPrevious ? "default" : "pointer" }}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button 
+              onClick={onNext}
+              disabled={!onNext}
+              className="hover-opacity"
+              title="Older Email"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "8px", background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "var(--text-primary)", opacity: !onNext ? 0.3 : 1, cursor: !onNext ? "default" : "pointer" }}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+
           <button 
             onClick={() => handleAction('archive')}
             disabled={!!processingAction}
