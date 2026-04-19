@@ -25,10 +25,10 @@ export default async function Home() {
       {/* Widget Grid - Flat Layout using CSS Grid for auto wrapping */}
       <div className="dashboard-grid">
         <TodayWidget />
-        <NotionWidget />
+        <CalendarWidget />
         <GmailWidget limit={10} />
         <TasksWidget />
-        <CalendarWidget />
+        <NotionWidget />
         <DriveWidget />
       </div>
     </div>
