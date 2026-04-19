@@ -48,7 +48,7 @@ export default function DriveSearchWidget() {
           onChange={(e) => setQuery(e.target.value)}
           style={{
             width: "100%",
-            background: "var(--bg-deep)",
+            background: "rgba(255,255,255,0.05)",
             border: "1px solid var(--glass-border)",
             borderRadius: "16px",
             padding: "18px 54px",
