@@ -76,27 +76,28 @@ export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: 
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
           {!fullPage && <Mail size={20} />}
           <h3 style={{ fontWeight: 600 }}>{!fullPage ? "Gmail Inbox" : "Inbox"}</h3>
+        </div>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <button 
             onClick={() => setIsComposing(true)}
             className="hover-opacity"
             title="Compose Email"
             style={{ 
-              background: "rgba(255,255,255,0.1)", 
-              color: "white", 
-              width: "24px", 
-              height: "24px", 
-              borderRadius: "6px", 
+              background: "var(--accent-primary)", 
+              color: "black", 
+              padding: "6px 12px",
+              borderRadius: "8px", 
               display: "flex", 
               alignItems: "center", 
-              justifyContent: "center",
-              marginLeft: "4px"
+              gap: "6px",
+              fontWeight: 600,
+              fontSize: "0.85rem",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
             }}
           >
-            <Plus size={14} strokeWidth={3} />
+            <Plus size={16} strokeWidth={3} /> Compose
           </button>
-        </div>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "none" }}>
             {messages?.filter((m: any) => m.isUnread).length} Unread
           </span>
