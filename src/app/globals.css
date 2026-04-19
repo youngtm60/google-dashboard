@@ -5,7 +5,7 @@ html {
 
 :root {
   /* Core Palette (Light Theme) */
-  --bg-deep: #f5f6f8; /* Soft off-white for the main background */
+  --bg-deep: #64748B; /* Soft off-white for the main background */
   --bg-nebula: none; /* Removed the dark gradient */
   --foreground: #111827; /* Dark text */
   
