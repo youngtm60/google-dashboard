@@ -64,8 +64,7 @@ export default function TodayWidget() {
     <section className="glass-panel" style={{ 
       padding: "20px", 
       borderRadius: "24px", 
-      minHeight: "300px", 
-      maxHeight: "400px", 
+      height: "450px", 
       display: "flex", 
       flexDirection: "column" 
     }}>
