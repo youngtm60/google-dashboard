@@ -28,11 +28,31 @@ export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: 
 
   if (isLoading) return <WidgetSkeleton />;
 
+  // Local filtering for search and sort by date
+  // MOVE THIS UP so we have access to it for the detail view
+  const displayMessages = (messages || [])
+    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .filter((msg: any) => {
+    const q = searchQuery.toLowerCase();
+    return msg.subject.toLowerCase().includes(q) || 
+           msg.from.toLowerCase().includes(q) ||
+           msg.snippet.toLowerCase().includes(q);
+  });
+
   // Render Full Page Message Detail
   if (fullPage && urlMessageId) {
+    const activeIndex = displayMessages.findIndex((m: any) => m.id === urlMessageId);
+    const nextMsgId = (activeIndex >= 0 && activeIndex < displayMessages.length - 1) ? displayMessages[activeIndex + 1].id : null;
+    const prevMsgId = (activeIndex > 0) ? displayMessages[activeIndex - 1].id : null;
+
     return (
       <section className="glass-panel" style={{padding: "40px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "100%", minHeight: "600px"}}>
-        <GmailMessageDetail messageId={urlMessageId} onBack={() => router.push('/gmail')} />
+        <GmailMessageDetail 
+          messageId={urlMessageId} 
+          onBack={() => router.push('/gmail')}
+          onNext={nextMsgId ? () => router.push('/gmail?messageId=' + nextMsgId) : undefined}
+          onPrevious={prevMsgId ? () => router.push('/gmail?messageId=' + prevMsgId) : undefined}
+        />
       </section>
     );
   }
@@ -45,16 +65,6 @@ export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: 
       </section>
     );
   }
-
-  // Local filtering for search and sort by date
-  const displayMessages = (messages || [])
-    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .filter((msg: any) => {
-    const q = searchQuery.toLowerCase();
-    return msg.subject.toLowerCase().includes(q) || 
-           msg.from.toLowerCase().includes(q) ||
-           msg.snippet.toLowerCase().includes(q);
-  });
 
   const handleEmailClick = (msgId: string) => {
     router.push('/gmail?messageId=' + msgId);
