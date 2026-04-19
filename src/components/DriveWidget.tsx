@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import useSWR from 'swr';
-import { Cloud, FileText, Image as ImageIcon, FileJson, File as FileIcon, Clock, Search, ListFilter } from 'lucide-react';
+import { Cloud, FileText, Image as ImageIcon, FileJson, File as FileIcon, Clock, Search, ListFilter, ExternalLink } from 'lucide-react';
 import WidgetSkeleton from './WidgetSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -39,7 +39,30 @@ export default function DriveWidget() {
           <h3 style={{ fontWeight: 600 }}>Google Drive</h3>
         </div>
         
-
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <a 
+            href="https://drive.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover-opacity"
+            title="Open Google Drive"
+            style={{ 
+              background: "var(--accent-emerald)", 
+              color: "black", 
+              padding: "6px 12px",
+              borderRadius: "8px", 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "6px",
+              fontWeight: 600,
+              fontSize: "0.85rem",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              textDecoration: "none"
+            }}
+          >
+            <ExternalLink size={16} strokeWidth={2.5} /> Open Drive
+          </a>
+        </div>
       </div>
 
       <div style={{ position: "relative", marginBottom: "20px" }}>
