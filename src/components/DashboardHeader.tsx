@@ -2,6 +2,7 @@
 
 import useSWR from 'swr';
 import { Loader2 } from 'lucide-react';
+import PomodoroWidget from './widgets/PomodoroWidget';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -27,7 +28,7 @@ export default function DashboardHeader() {
     <header style={{ 
       display: "flex", 
       justifyContent: "space-between", 
-      alignItems: "center", 
+      alignItems: "flex-start", 
       marginBottom: "32px",
       padding: "10px 0"
     }}>
@@ -54,7 +55,7 @@ export default function DashboardHeader() {
         </div>
       </div>
       
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
         <div style={{ 
           background: "var(--glass-bg)", 
           padding: "8px 16px", 
@@ -67,6 +68,7 @@ export default function DashboardHeader() {
         }}>
           {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
         </div>
+        <PomodoroWidget />
       </div>
     </header>
   );
