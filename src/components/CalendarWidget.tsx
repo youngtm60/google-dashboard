@@ -35,7 +35,7 @@ interface CalendarInfo {
   colorId: string;
 }
 
-export default function CalendarWidget() {
+export default function CalendarWidget({ fullPage = false }: { fullPage?: boolean }) {
   const [selectedCalendars, setSelectedCalendars] = useState<string[]>(['primary']);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [calendarList, setCalendarList] = useState<CalendarInfo[]>([]);
@@ -109,7 +109,7 @@ export default function CalendarWidget() {
 
   if (isCreating) {
     return (
-      <section className="glass-panel animate-fade-in" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
+      <section className="glass-panel animate-fade-in" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullPage ? "100%" : "450px"}}>
         <CalendarEventCreate onBack={() => setIsCreating(false)} onSuccess={() => setIsCreating(false)} />
       </section>
     );
@@ -119,7 +119,7 @@ export default function CalendarWidget() {
     const activeEvent = events.find((e: CalendarEvent) => e.id === activeEventId);
     if (activeEvent) {
       return (
-        <section className="glass-panel animate-fade-in" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
+        <section className="glass-panel animate-fade-in" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullPage ? "100%" : "450px"}}>
           <CalendarEventDetail event={activeEvent} onBack={() => setActiveEventId(null)} />
         </section>
       );
@@ -127,7 +127,7 @@ export default function CalendarWidget() {
   }
 
   return (
-    <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px" }}>
+    <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullPage ? "100%" : "450px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-sky)" }}>
           <Calendar size={20} />

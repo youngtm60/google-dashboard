@@ -33,8 +33,8 @@ export default function CalendarPage() {
         </p>
       </header>
 
-      <div style={{ flex: 1, minHeight: 0, paddingBottom: "40px" }}>
-        <CalendarWidget />
+      <div style={{ flex: 1, minHeight: "600px", height: "100%", width: "100%", paddingBottom: "40px" }}>
+        <CalendarWidget fullPage={true} />
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
+  const [viewMode, setViewMode] = useState<'recent' | 'all'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'alpha'>('date');
   
   // States for actions
