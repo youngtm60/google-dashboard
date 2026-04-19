@@ -102,7 +102,7 @@ export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: 
           placeholder="Search emails, senders, or subjects..."
           style={{
             width: "100%",
-            background: "var(--bg-deep)",
+            background: "rgba(255,255,255,0.05)",
             border: "1px solid var(--glass-border)",
             borderRadius: "10px",
             padding: "8px 12px 8px 34px",

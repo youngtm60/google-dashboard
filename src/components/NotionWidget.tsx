@@ -152,7 +152,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
 
       
       {showCreateForm && (
-        <div style={{ marginBottom: "16px", background: "var(--bg-deep)", padding: "12px", borderRadius: "12px", border: "1px solid var(--glass-border)" }} className="animate-fade-in">
+        <div style={{ marginBottom: "16px", background: "rgba(255,255,255,0.05)", padding: "12px", borderRadius: "12px", border: "1px solid var(--glass-border)" }} className="animate-fade-in">
           <input
             type="text"
             value={newNoteTitle}
