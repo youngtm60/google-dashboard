@@ -25,8 +25,8 @@ export default function TasksPage() {
           Back to Dashboard
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <CheckSquare size={32} style={{ color: "var(--accent-secondary)" }} />
-          <h1 style={{ fontSize: "2.5rem", fontWeight: 800, color: "var(--accent-secondary)" }}>Tasks Overview</h1>
+          <CheckSquare size={32} style={{ color: "var(--accent-cyan)" }} />
+          <h1 style={{ fontSize: "2.5rem", fontWeight: 800, color: "var(--accent-cyan)" }}>Tasks Overview</h1>
         </div>
         <p style={{ color: "var(--text-secondary)", marginTop: "8px" }}>
           Manage your daily objectives and sync progress with Google Tasks.

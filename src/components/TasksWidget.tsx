@@ -105,7 +105,7 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
     <section className="glass-panel" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullPage ? "100%" : "450px"}}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-secondary)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-cyan)" }}>
           <CheckSquare size={20} />
           <h3 style={{ fontWeight: 600 }}>Tasks</h3>
         </div>
@@ -115,13 +115,13 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
           <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
             <button 
               onClick={() => setSortBy('date')}
-              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'date' ? "var(--accent-secondary)" : "transparent", color: sortBy === 'date' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'date' ? "var(--accent-cyan)" : "transparent", color: sortBy === 'date' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
             >
               Date
             </button>
             <button 
               onClick={() => setSortBy('alpha')}
-              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'alpha' ? "var(--accent-secondary)" : "transparent", color: sortBy === 'alpha' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'alpha' ? "var(--accent-cyan)" : "transparent", color: sortBy === 'alpha' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
             >
               A-Z
             </button>
@@ -129,13 +129,13 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
           <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
             <button 
               onClick={() => { setViewMode('recent'); setSearchQuery(''); }}
-              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'recent' ? "var(--accent-secondary)" : "transparent", color: viewMode === 'recent' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'recent' ? "var(--accent-cyan)" : "transparent", color: viewMode === 'recent' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
             >
               Recent
             </button>
             <button 
               onClick={() => { setViewMode('all'); setSearchQuery(''); }}
-              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'all' ? "var(--accent-secondary)" : "transparent", color: viewMode === 'all' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'all' ? "var(--accent-cyan)" : "transparent", color: viewMode === 'all' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
             >
               All
             </button>
@@ -147,7 +147,7 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
         <form onSubmit={handleAddTask} style={{ display: "flex", gap: "8px" }}>
           <input type="text" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Quick add to My Tasks..." style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "8px 12px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none" }} />
-          <button type="submit" disabled={isAdding || !newTaskTitle.trim()} style={{ background: "var(--accent-secondary)", color: "white", width: "36px", height: "36px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", opacity: (isAdding || !newTaskTitle.trim()) ? 0.5 : 1 }}>
+          <button type="submit" disabled={isAdding || !newTaskTitle.trim()} style={{ background: "var(--accent-cyan)", color: "white", width: "36px", height: "36px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", opacity: (isAdding || !newTaskTitle.trim()) ? 0.5 : 1 }}>
             {isAdding ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
           </button>
         </form>
@@ -174,13 +174,13 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
             const children = subTasksByParent[task.id] || [];
             return (
               <div key={task.id} style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
-                <div key={task.id} className="glass-card hover-opacity" style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyItems: "space-between", gap: "12px", flexShrink: 0, width: level > 0 ? `calc(100% - ${level * 24}px)` : "100%", marginLeft: level > 0 ? `${level * 24}px` : "0", borderLeft: level > 0 ? "3px solid var(--accent-secondary)" : undefined, opacity: level > 0 ? 0.9 : 1 }}>
+                <div key={task.id} className="glass-card hover-opacity" style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyItems: "space-between", gap: "12px", flexShrink: 0, width: level > 0 ? `calc(100% - ${level * 24}px)` : "100%", marginLeft: level > 0 ? `${level * 24}px` : "0", borderLeft: level > 0 ? "3px solid var(--accent-cyan)" : undefined, opacity: level > 0 ? 0.9 : 1 }}>
             
             <button 
               onClick={() => toggleTask(task.id, task.listId, task.status)}
               disabled={completingIds.includes(task.id) || isProcessing}
               title="Complete Task"
-              style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2px solid", borderColor: task.status === 'completed' ? "var(--accent-secondary)" : "var(--glass-border)", background: task.status === 'completed' ? "var(--accent-secondary)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", opacity: completingIds.includes(task.id) ? 0.5 : 1, cursor: "pointer", flexShrink: 0 }}
+              style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2px solid", borderColor: task.status === 'completed' ? "var(--accent-cyan)" : "var(--glass-border)", background: task.status === 'completed' ? "var(--accent-cyan)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", opacity: completingIds.includes(task.id) ? 0.5 : 1, cursor: "pointer", flexShrink: 0 }}
             >
               {completingIds.includes(task.id) ? <Loader2 size={10} className="animate-spin" /> : task.status === 'completed' ? <Check size={12} strokeWidth={4} /> : null}
             </button>
@@ -197,10 +197,10 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
                       if (e.key === 'Enter') handleEditSave(task.id, task.listId);
                       if (e.key === 'Escape') setEditingTaskId(null);
                     }}
-                    style={{ flex: 1, background: "rgba(255,255,255,0.1)", border: "1px solid var(--accent-secondary)", borderRadius: "6px", padding: "4px 8px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", minWidth: 0 }}
+                    style={{ flex: 1, background: "rgba(255,255,255,0.1)", border: "1px solid var(--accent-cyan)", borderRadius: "6px", padding: "4px 8px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", minWidth: 0 }}
                   />
                   <button onClick={() => setEditingTaskId(null)} disabled={isProcessing} style={{ background: "transparent", color: "var(--text-muted)", cursor: "pointer" }}><X size={14} /></button>
-                  <button onClick={() => handleEditSave(task.id, task.listId)} disabled={isProcessing} style={{ background: "var(--accent-secondary)", color: "black", padding: "4px 8px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, cursor: isProcessing ? "wait" : "pointer" }}>
+                  <button onClick={() => handleEditSave(task.id, task.listId)} disabled={isProcessing} style={{ background: "var(--accent-cyan)", color: "black", padding: "4px 8px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, cursor: isProcessing ? "wait" : "pointer" }}>
                     {isProcessing ? "..." : "Save"}
                   </button>
                 </div>
@@ -221,7 +221,7 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
                             setViewMode('all');
                           }}
                           style={{ 
-                            color: "var(--accent-secondary)",
+                            color: "var(--accent-cyan)",
                             background: "rgba(255,255,255,0.1)",
                             border: "1px solid rgba(255,255,255,0.05)",
                             padding: "2px 6px",
