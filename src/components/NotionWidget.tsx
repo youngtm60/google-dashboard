@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { Notebook, Clock, ExternalLink, Search, Plus, Loader2 } from 'lucide-react';
 import WidgetSkeleton from './WidgetSkeleton';
 import NotionNoteEditor from './widgets/NotionNoteEditor';
+import CenterPeekModal from './CenterPeekModal';
 import { createNotionPage } from '@/lib/actions/notion-actions';
 import { mutate } from 'swr';
 
@@ -59,30 +60,16 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
     ? displayNotes.slice(0, 10) 
     : [...displayNotes].sort((a: any, b: any) => a.title.localeCompare(b.title));
 
+  let activeNote = null;
   if (activeNoteId) {
-    
-    let activeNote = notes?.find((n: any) => n.id === activeNoteId);
-    // Fallback if SWR hasn't updated yet for newly created notes
+    activeNote = notes?.find((n: any) => n.id === activeNoteId);
     if (!activeNote && activeNoteId) {
       activeNote = { id: activeNoteId, title: "New Note", notebook: "Personal", icon: "📄" };
-    }
-
-    if (activeNote) {
-      return (
-        <section className="glass-panel" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
-          <NotionNoteEditor 
-            note={activeNote} 
-            onBack={() => {
-              setActiveNoteId(null);
-              setViewMode('recent');
-            }} 
-          />
-        </section>
-      );
     }
   }
 
   return (
+    <>
     <section className="glass-panel" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-amber)" }}>
@@ -311,5 +298,24 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
         )}
       </div>
     </section>
+
+    <CenterPeekModal 
+      isOpen={!!activeNote} 
+      onClose={() => {
+        setActiveNoteId(null);
+      }}
+    >
+      {activeNote && (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '32px', overflow: 'hidden' }}>
+          <NotionNoteEditor 
+            note={activeNote} 
+            onBack={() => {
+              setActiveNoteId(null);
+            }} 
+          />
+        </div>
+      )}
+    </CenterPeekModal>
+    </>
   );
 }
