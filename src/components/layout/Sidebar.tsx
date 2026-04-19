@@ -25,7 +25,7 @@ const navItems = [
   { href: "/drive", label: "Drive", icon: HardDrive, color: "var(--accent-emerald)" },
   { href: "/gmail", label: "Gmail", icon: Mail, color: "var(--accent-primary)" },
   { href: "/notion", label: "Notes", icon: Notebook, color: "var(--accent-amber)" },
-  { href: "/tasks", label: "Tasks", icon: CheckSquare, color: "var(--accent-secondary)" },
+  { href: "/tasks", label: "Tasks", icon: CheckSquare, color: "var(--accent-cyan)" },
 ];
 
 export default function Sidebar() {
@@ -70,7 +70,7 @@ export default function Sidebar() {
                 gap: "12px",
                 padding: "10px 14px",
                 borderRadius: "8px",
-                color: isActive ? item.color : "var(--text-secondary)",
+                color: item.color,
                 background: isActive ? `rgba(107, 90, 237, 0.08)` : "transparent",
                 transition: "all 0.2s ease",
                 textDecoration: "none"
@@ -79,13 +79,13 @@ export default function Sidebar() {
               <Icon 
                 size={18} 
                 style={{ 
-                  color: isActive ? item.color : "var(--text-secondary)",
+                  color: item.color,
                 }} 
               />
               <span style={{ 
                 fontWeight: isActive ? 600 : 500, 
                 fontSize: "0.9rem",
-                color: isActive ? item.color : "var(--text-secondary)"
+                color: item.color
               }}>
                 {item.label}
               </span>
