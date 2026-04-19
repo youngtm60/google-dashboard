@@ -132,7 +132,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
           
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="hover-opacity glass-card"
+            className="hover-opacity"
             style={{
               display: "flex",
               alignItems: "center",
@@ -140,8 +140,9 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
               width: "28px",
               height: "28px",
               borderRadius: "8px",
-              border: "1px solid var(--glass-border)",
-              color: "var(--accent-amber)"
+              border: "none",
+              background: "#FCD34D",
+              color: "white"
             }}
           >
             <Plus size={16} />

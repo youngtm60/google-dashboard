@@ -149,8 +149,8 @@ export default function CalendarWidget({ fullPage = false }: { fullPage?: boolea
             onClick={() => setIsCreating(true)}
             className="hover-opacity"
             style={{ 
-              background: "var(--accent-primary)", color: "white", border: "none", borderRadius: "8px", 
-              padding: "4px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 10px rgba(129, 140, 248, 0.4)"
+              background: "#7DD3FC", color: "white", border: "none", borderRadius: "8px", 
+              padding: "4px", display: "flex", alignItems: "center", justifyContent: "center"
             }}
             title="Create new event"
           >

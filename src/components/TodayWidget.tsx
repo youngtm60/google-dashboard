@@ -78,7 +78,10 @@ export default function TodayWidget() {
           onClick={clearNotes}
           className="hover-opacity"
           style={{ 
-            color: "var(--text-muted)",
+            color: "white",
+            background: "#FDA4AF",
+            padding: "4px 8px",
+            borderRadius: "6px",
             display: "flex",
             alignItems: "center",
             gap: "4px"

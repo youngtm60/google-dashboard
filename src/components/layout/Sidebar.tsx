@@ -23,7 +23,7 @@ const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard, color: "var(--accent-primary)" },
   { href: "/calendar", label: "Calendar", icon: Calendar, color: "var(--accent-sky)" },
   { href: "/drive", label: "Drive", icon: HardDrive, color: "var(--accent-emerald)" },
-  { href: "/gmail", label: "Gmail", icon: Mail, color: "var(--accent-primary)" },
+  { href: "/gmail", label: "Gmail", icon: Mail, color: "#4A5568" },
   { href: "/notion", label: "Notes", icon: Notebook, color: "var(--accent-amber)" },
   { href: "/tasks", label: "Tasks", icon: CheckSquare, color: "var(--accent-cyan)" },
 ];

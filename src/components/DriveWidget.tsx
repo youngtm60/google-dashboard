@@ -47,8 +47,8 @@ export default function DriveWidget() {
             className="hover-opacity"
             title="Open Google Drive"
             style={{ 
-              background: "var(--accent-emerald)", 
-              color: "black", 
+              background: "#6EE7B7", 
+              color: "white", 
               padding: "6px 12px",
               borderRadius: "8px", 
               display: "flex", 

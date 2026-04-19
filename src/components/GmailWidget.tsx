@@ -73,7 +73,7 @@ export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: 
   return (
     <section className="glass-panel" style={{padding: "24px", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullPage ? "100%" : "450px"}}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#4A5568" }}>
           {!fullPage && <Mail size={20} />}
           <h3 style={{ fontWeight: 600 }}>{!fullPage ? "Gmail Inbox" : "Inbox"}</h3>
         </div>
@@ -84,8 +84,8 @@ export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: 
             className="hover-opacity"
             title="Compose Email"
             style={{ 
-              background: "var(--accent-primary)", 
-              color: "black", 
+              background: "#A0AEC0", 
+              color: "white", 
               padding: "6px 12px",
               borderRadius: "8px", 
               display: "flex", 
