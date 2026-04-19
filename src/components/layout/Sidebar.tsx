@@ -26,7 +26,6 @@ const navItems = [
   { href: "/gmail", label: "Gmail", icon: Mail, color: "var(--accent-primary)" },
   { href: "/notion", label: "Notes", icon: Notebook, color: "var(--accent-amber)" },
   { href: "/tasks", label: "Tasks", icon: CheckSquare, color: "var(--accent-secondary)" },
-  { href: "/today", label: "Today", icon: Edit3, color: "var(--accent-rose)" },
 ];
 
 export default function Sidebar() {
