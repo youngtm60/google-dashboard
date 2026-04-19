@@ -6,8 +6,8 @@ import Link from "next/link";
 
 export default function TasksPage() {
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: "100px" }}>
-      <header style={{ marginBottom: "40px" }}>
+    <div className="animate-fade-in" style={{ paddingBottom: "100px", height: "100%", display: "flex", flexDirection: "column" }}>
+      <header style={{ marginBottom: "40px", flexShrink: 0 }}>
         <Link 
           href="/" 
           style={{ 
@@ -33,8 +33,8 @@ export default function TasksPage() {
         </p>
       </header>
 
-      <div style={{ maxWidth: "800px" }}>
-        <TasksWidget />
+      <div style={{ flex: 1, width: "100%", height: "100%", minHeight: "600px", maxWidth: "800px", margin: "0 auto" }}>
+        <TasksWidget fullPage={true} />
       </div>
     </div>
   );

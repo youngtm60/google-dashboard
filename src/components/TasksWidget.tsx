@@ -8,7 +8,7 @@ import WidgetSkeleton from './WidgetSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string }) {
+export default function TasksWidget({ maxHeight = "none", fullPage = false }: { maxHeight?: string, fullPage?: boolean }) {
   const { mutate } = useSWRConfig();
   const { data: tasks, isLoading } = useSWR('/api/workspace/tasks', fetcher, {
     refreshInterval: 1000 * 60 * 5,
@@ -102,7 +102,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
   const finalTasks = viewMode === 'recent' ? displayTasks.slice(0, 10) : displayTasks;
 
   return (
-    <section className="glass-panel" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
+    <section className="glass-panel" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullPage ? "100%" : "450px"}}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-secondary)" }}>
