@@ -1,8 +1,9 @@
 'use client';
 
 import useSWR from 'swr';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Menu } from 'lucide-react';
 import PomodoroWidget from './widgets/PomodoroWidget';
+import { useSidebar } from '@/lib/SidebarContext';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -14,6 +15,8 @@ export default function DashboardHeader() {
   const { data: messages, isLoading: messagesLoading } = useSWR('/api/workspace/gmail?limit=50&q=is:unread', fetcher, {
     refreshInterval: 1000 * 60 * 5,
   });
+
+  const { toggleNowsta } = useSidebar();
 
   const isLoading = tasksLoading || messagesLoading;
   
@@ -55,7 +58,7 @@ export default function DashboardHeader() {
         </div>
       </div>
       
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "16px" }}>
         <div style={{ 
           background: "var(--glass-bg)", 
           padding: "8px 16px", 
@@ -68,7 +71,34 @@ export default function DashboardHeader() {
         }}>
           {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
         </div>
-        <PomodoroWidget />
+        
+        <div style={{ display: "flex", gap: "12px", alignItems: "flex-end" }}>
+          <button
+            onClick={toggleNowsta}
+            style={{
+              background: 'var(--glass-bg)',
+              border: '1px solid var(--glass-border)',
+              borderRadius: '20px',
+              padding: '8px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '0.9rem',
+              fontWeight: 500,
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+              transition: 'background-color 0.2s',
+              height: '38px'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg, #f3f4f6)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--glass-bg)'}
+          >
+            <Menu size={16} />
+            Nowsta
+          </button>
+          <PomodoroWidget />
+        </div>
       </div>
     </header>
   );
