@@ -89,7 +89,7 @@ export default function DashboardHeader() {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                background: '#319AB5',
+                background: '#0078D4',
                 border: 'none',
                 borderRadius: '20px',
                 padding: '8px 16px',
@@ -105,8 +105,8 @@ export default function DashboardHeader() {
                 height: '38px',
                 boxSizing: 'border-box'
               }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#29829A'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#319AB5'}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#005A9E'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0078D4'}
             >
               <Calendar size={16} />
               Outlook
