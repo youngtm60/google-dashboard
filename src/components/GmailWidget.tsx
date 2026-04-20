@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import {  useState , useEffect } from 'react';
 import useSWR from 'swr';
 import { Send, Clock, Mail, Search, Plus } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,6 +16,12 @@ export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: 
   const urlMessageId = searchParams?.get('messageId');
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
   const [isComposing, setIsComposing] = useState(false);
 
   // Use broader inbox fetch
@@ -26,14 +32,12 @@ export default function GmailWidget({ limit = 10, fullPage = false }: { limit?: 
     refreshInterval: 1000 * 60 * 5,
   });
 
-  if (isLoading) return <WidgetSkeleton />;
-
-  // Local filtering for search and sort by date
+    // Local filtering for search and sort by date
   // MOVE THIS UP so we have access to it for the detail view
   const displayMessages = (messages || [])
     .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .filter((msg: any) => {
-    const q = searchQuery.toLowerCase();
+    const q = debouncedQuery.toLowerCase();
     return msg.subject.toLowerCase().includes(q) || 
            msg.from.toLowerCase().includes(q) ||
            msg.snippet.toLowerCase().includes(q);

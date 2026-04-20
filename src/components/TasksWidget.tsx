@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import {  useState , useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { CheckSquare, Check, Plus, Loader2, Search, Edit2, Trash2, X } from 'lucide-react';
 import { addTask, completeTask, editTaskTitle, deleteTask } from '@/lib/actions/task-actions';
@@ -16,6 +16,12 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
   const [viewMode, setViewMode] = useState<'recent' | 'all'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'alpha'>('date');
   
@@ -79,11 +85,9 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
     setIsProcessing(false);
   };
 
-  if (isLoading) return <WidgetSkeleton />;
-
-  // Filter and Search logic
+    // Filter and Search logic
   let displayTasks = (tasks?.filter((t: any) => t.status !== 'completed') || []).filter((task: any) => {
-    const query = searchQuery.toLowerCase();
+    const query = debouncedQuery.toLowerCase();
     return task.title.toLowerCase().includes(query) || 
            (task.listName && task.listName.toLowerCase().includes(query));
   });
@@ -160,7 +164,7 @@ export default function TasksWidget({ maxHeight = "none", fullPage = false }: { 
 
       {/* Task List */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", overflowY: "auto", maxHeight: maxHeight, paddingRight: "4px", width: "100%" }} className="custom-scrollbar">
-        {(() => {
+        {isLoading && !tasks ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} /></div> : (() => {
           const topLevelTasks = finalTasks.filter((t: any) => !t.parentId || !finalTasks.some((p: any) => p.id === t.parentId));
           const subTasksByParent = finalTasks.reduce((acc: any, t: any) => {
             if (t.parentId) {

@@ -23,27 +23,48 @@ export async function searchGoogleContacts(query: string) {
       return { success: true, results: [] };
     }
 
-    const res = await people.people.searchContacts({
-      query: query,
-      readMask: 'names,emailAddresses',
-    });
-
     const results: { name: string; email: string }[] = [];
+    const seenEmails = new Set();
 
-    const connections = res.data.results || [];
-    
-    connections.forEach((personResult) => {
+    const processPerson = (personResult: any) => {
       const person = personResult.person;
       if (!person) return;
       
       const emailObj = person.emailAddresses && person.emailAddresses.length > 0 ? person.emailAddresses[0] : null;
       if (!emailObj || !emailObj.value) return;
 
+      if (seenEmails.has(emailObj.value)) return;
+      seenEmails.add(emailObj.value);
+
       const nameObj = person.names && person.names.length > 0 ? person.names[0] : null;
       const name = nameObj?.displayName || emailObj.value.split('@')[0];
 
       results.push({ name, email: emailObj.value });
-    });
+    };
+
+    // 1. Search explicitly saved contacts
+    try {
+      const res = await people.people.searchContacts({
+        query: query,
+        readMask: 'names,emailAddresses',
+      });
+      const connections = res.data.results || [];
+      connections.forEach(processPerson);
+    } catch (e) {
+      console.error('Error searching regular contacts:', e);
+    }
+
+    // 2. Search "Other Contacts" (frequently contacted)
+    try {
+      const otherRes = await people.otherContacts.search({
+        query: query,
+        readMask: 'names,emailAddresses',
+      });
+      const otherConnections = otherRes.data.results || [];
+      otherConnections.forEach(processPerson);
+    } catch (e) {
+      console.error('Error searching other contacts:', e);
+    }
 
     return { success: true, results };
   } catch (error: any) {

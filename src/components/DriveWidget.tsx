@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import {  useState , useEffect } from 'react';
 import useSWR from 'swr';
 import { Cloud, FileText, Image as ImageIcon, FileJson, File as FileIcon, Clock, Search, ListFilter, ExternalLink } from 'lucide-react';
 import WidgetSkeleton from './WidgetSkeleton';
@@ -20,14 +20,18 @@ export default function DriveWidget() {
   });
 
     const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
-  if (isLoading) return <WidgetSkeleton />;
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-  // Filter and mode logic (sorted by modified date descending)
+    // Filter and mode logic (sorted by modified date descending)
   const displayFiles = (files || [])
     .sort((a: any, b: any) => new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime())
     .filter((file: any) => {
-      const query = searchQuery.toLowerCase();
+      const query = debouncedQuery.toLowerCase();
       return file.name.toLowerCase().includes(query);
     });
 
@@ -93,7 +97,7 @@ export default function DriveWidget() {
         overflowY: "auto",
         paddingRight: "4px"
       }}>
-        {displayFiles.map((file: any) => (
+        {isLoading && !files ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} /></div> : displayFiles.map((file: any) => (
           <a 
             key={file.id} 
             href={file.webViewLink} 

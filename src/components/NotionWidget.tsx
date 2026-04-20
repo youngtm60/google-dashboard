@@ -42,7 +42,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
 
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 400);
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -50,9 +50,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
     refreshInterval: 1000 * 60 * 10, // 10 minutes polling
   });
 
-  if (isLoading) return <WidgetSkeleton />;
-
-  // We no longer need client-side filtering because notion.search handles full-text search!
+    // We no longer need client-side filtering because notion.search handles full-text search!
   const displayNotes = notes || [];
 
   const finalNotes = viewMode === 'recent' 
@@ -92,6 +90,28 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
         
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <a 
+            href="https://www.notion.so"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover-opacity"
+            title="Open Notion"
+            style={{ 
+              background: "#FCD34D", 
+              color: "white", 
+              padding: "6px 12px",
+              borderRadius: "8px", 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "6px",
+              fontWeight: 600,
+              fontSize: "0.85rem",
+              textDecoration: "none"
+            }}
+          >
+            <ExternalLink size={16} strokeWidth={2.5} /> Open Notion
+          </a>
+
           {/* View Mode Toggle */}
           <div style={{ 
             background: "rgba(255,255,255,0.05)", 
@@ -254,7 +274,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
         overflowY: "auto",
         paddingRight: "4px" 
       }}>
-        {finalNotes.map((note: any) => (
+        {isLoading && !notes ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} /></div> : finalNotes.map((note: any) => (
           <div 
             key={note.id} 
             onClick={() => setActiveNoteId(note.id)}

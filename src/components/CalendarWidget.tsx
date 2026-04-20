@@ -80,6 +80,12 @@ export default function CalendarWidget({ fullPage = false }: { fullPage?: boolea
   );
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -87,14 +93,14 @@ export default function CalendarWidget({ fullPage = false }: { fullPage?: boolea
     if (!events || !Array.isArray(events)) return [];
     
     let filtered = events;
-    if (searchQuery) {
+    if (debouncedQuery) {
       filtered = filtered.filter(event => 
-        event.summary?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.location?.toLowerCase().includes(searchQuery.toLowerCase())
+        event.summary?.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+        event.location?.toLowerCase().includes(debouncedQuery.toLowerCase())
       );
     }
     return filtered;
-  }, [events, searchQuery]);
+  }, [events, debouncedQuery]);
 
   const formatTime = (dateTimeStr?: string) => {
     if (!dateTimeStr) return 'All Day';
