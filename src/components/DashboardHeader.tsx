@@ -6,6 +6,8 @@ import PomodoroWidget from './widgets/PomodoroWidget';
 import MiniCalendar from './widgets/MiniCalendar';
 import { useSidebar } from '@/lib/SidebarContext';
 
+let outlookWindow: Window | null = null;
+
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function DashboardHeader() {
@@ -84,10 +86,15 @@ export default function DashboardHeader() {
           {/* Timer Row */}
           <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
             {/* Outlook Button */}
-            <a
-              href="https://outlook.cloud.microsoft/calendar/view/week"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                if (outlookWindow && !outlookWindow.closed) {
+                  outlookWindow.focus();
+                } else {
+                  outlookWindow = window.open('https://outlook.cloud.microsoft/calendar/view/week', 'OutlookTab');
+                }
+              }}
               style={{
                 background: '#0078D4',
                 border: 'none',
@@ -99,7 +106,7 @@ export default function DashboardHeader() {
                 fontSize: '0.9rem',
                 fontWeight: 500,
                 color: 'white',
-                textDecoration: 'none',
+                cursor: 'pointer',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
                 transition: 'background-color 0.2s',
                 height: '38px',
@@ -110,7 +117,7 @@ export default function DashboardHeader() {
             >
               <Calendar size={16} />
               Outlook
-            </a>
+            </button>
             
             {/* Nowsta Button */}
             <button
