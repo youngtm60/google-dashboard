@@ -93,7 +93,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
           <a 
             href="https://www.notion.so"
             target="NotionTab"
-            rel="noopener noreferrer"
+            
             className="hover-opacity"
             title="Open Notion"
             style={{ 
@@ -296,7 +296,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.open(note.url, 'NotionTab', 'noopener,noreferrer');
+                  window.open(note.url, 'NotionTab');
                 }}
                 style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
                 title="Open in Notion"
