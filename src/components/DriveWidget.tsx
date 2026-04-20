@@ -5,6 +5,8 @@ import useSWR from 'swr';
 import { Cloud, FileText, Image as ImageIcon, FileJson, File as FileIcon, Clock, Search, ListFilter, ExternalLink , Loader2 } from 'lucide-react';
 import WidgetSkeleton from './WidgetSkeleton';
 
+let driveWindow: Window | null = null;
+
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const getFileIcon = (mimeType: string) => {
@@ -44,10 +46,15 @@ export default function DriveWidget() {
         </div>
         
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <a 
-            href="https://drive.google.com"
-            target="_blank"
-            rel="noopener noreferrer"
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              if (driveWindow && !driveWindow.closed) {
+                driveWindow.focus();
+              } else {
+                driveWindow = window.open('https://drive.google.com', 'DriveTab');
+              }
+            }}
             className="hover-opacity"
             title="Open Google Drive"
             style={{ 
@@ -65,7 +72,7 @@ export default function DriveWidget() {
             }}
           >
             <ExternalLink size={16} strokeWidth={2.5} /> Open Drive
-          </a>
+          </button>
         </div>
       </div>
 
@@ -98,11 +105,12 @@ export default function DriveWidget() {
         paddingRight: "4px"
       }}>
         {isLoading && !files ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} /></div> : displayFiles.map((file: any) => (
-          <a 
+          <button 
             key={file.id} 
-            href={file.webViewLink} 
-            target="_blank" 
-            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.preventDefault();
+              driveWindow = window.open(file.webViewLink, 'DriveTab');
+            }}
             className="glass-card hover-opacity" 
             style={{ 
               padding: "12px 16px", 
@@ -141,7 +149,7 @@ export default function DriveWidget() {
                 </div>
               </div>
             </div>
-          </a>
+          </button>
         ))}
         {displayFiles.length === 0 && (
           <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "40px 20px" }}>
