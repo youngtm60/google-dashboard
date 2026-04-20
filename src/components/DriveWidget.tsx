@@ -5,7 +5,6 @@ import useSWR from 'swr';
 import { Cloud, FileText, Image as ImageIcon, FileJson, File as FileIcon, Clock, Search, ListFilter, ExternalLink , Loader2 } from 'lucide-react';
 import WidgetSkeleton from './WidgetSkeleton';
 
-let driveWindow: Window | null = null;
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -46,15 +45,9 @@ export default function DriveWidget() {
         </div>
         
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              if (driveWindow && !driveWindow.closed) {
-                driveWindow.focus();
-              } else {
-                driveWindow = window.open('https://drive.google.com', 'DriveTab');
-              }
-            }}
+          <a 
+            href="https://drive.google.com"
+            target="DriveTab"
             className="hover-opacity"
             title="Open Google Drive"
             style={{ 
@@ -72,7 +65,7 @@ export default function DriveWidget() {
             }}
           >
             <ExternalLink size={16} strokeWidth={2.5} /> Open Drive
-          </button>
+          </a>
         </div>
       </div>
 
@@ -105,12 +98,10 @@ export default function DriveWidget() {
         paddingRight: "4px"
       }}>
         {isLoading && !files ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} /></div> : displayFiles.map((file: any) => (
-          <button 
+          <a 
             key={file.id} 
-            onClick={(e) => {
-              e.preventDefault();
-              driveWindow = window.open(file.webViewLink, 'DriveTab');
-            }}
+            href={file.webViewLink} 
+            target="DriveTab"
             className="glass-card hover-opacity" 
             style={{ 
               padding: "12px 16px", 
@@ -149,7 +140,7 @@ export default function DriveWidget() {
                 </div>
               </div>
             </div>
-          </button>
+          </a>
         ))}
         {displayFiles.length === 0 && (
           <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "40px 20px" }}>
