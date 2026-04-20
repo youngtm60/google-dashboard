@@ -2,7 +2,7 @@
 
 import {  useState , useEffect } from 'react';
 import useSWR from 'swr';
-import { Send, Clock, Mail, Search, Plus } from 'lucide-react';
+import { Send, Clock, Mail, Search, Plus, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import WidgetSkeleton from './WidgetSkeleton';
 import GmailMessageDetail from './widgets/GmailMessageDetail';

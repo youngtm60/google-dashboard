@@ -18,7 +18,6 @@ export async function searchGoogleContacts(query: string) {
 
     const people = google.people({ version: 'v1', auth });
 
-    // Ensure query is non-empty, otherwise there's nothing to search
     if (!query || query.trim() === '') {
       return { success: true, results: [] };
     }
@@ -27,7 +26,8 @@ export async function searchGoogleContacts(query: string) {
     const seenEmails = new Set();
 
     const processPerson = (personResult: any) => {
-      const person = personResult.person;
+      // Depending on the API, the object might be nested under 'person' or it might BE the person
+      const person = personResult.person || personResult;
       if (!person) return;
       
       const emailObj = person.emailAddresses && person.emailAddresses.length > 0 ? person.emailAddresses[0] : null;
@@ -42,30 +42,31 @@ export async function searchGoogleContacts(query: string) {
       results.push({ name, email: emailObj.value });
     };
 
-    // 1. Search explicitly saved contacts
     try {
       const res = await people.people.searchContacts({
         query: query,
         readMask: 'names,emailAddresses',
       });
       const connections = res.data.results || [];
+      console.log('SearchContacts results:', connections.length);
       connections.forEach(processPerson);
     } catch (e) {
       console.error('Error searching regular contacts:', e);
     }
 
-    // 2. Search "Other Contacts" (frequently contacted)
     try {
       const otherRes = await people.otherContacts.search({
         query: query,
         readMask: 'names,emailAddresses',
       });
       const otherConnections = otherRes.data.results || [];
+      console.log('OtherContacts results:', otherConnections.length);
       otherConnections.forEach(processPerson);
     } catch (e) {
       console.error('Error searching other contacts:', e);
     }
 
+    console.log('Final parsed results length:', results.length);
     return { success: true, results };
   } catch (error: any) {
     console.error('People API Search Error:', error);

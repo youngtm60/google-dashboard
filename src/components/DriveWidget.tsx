@@ -2,7 +2,7 @@
 
 import {  useState , useEffect } from 'react';
 import useSWR from 'swr';
-import { Cloud, FileText, Image as ImageIcon, FileJson, File as FileIcon, Clock, Search, ListFilter, ExternalLink } from 'lucide-react';
+import { Cloud, FileText, Image as ImageIcon, FileJson, File as FileIcon, Clock, Search, ListFilter, ExternalLink , Loader2 } from 'lucide-react';
 import WidgetSkeleton from './WidgetSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
