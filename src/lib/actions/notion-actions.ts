@@ -140,3 +140,25 @@ export async function createNotionPage(title: string, notebook: string = 'Person
     }
   }
 }
+
+
+export async function deleteNotionPage(pageId: string) {
+  if (!notionToken) {
+    // Remove from mock data
+    const idx = MOCK_NOTION_PAGES.findIndex(p => p.id === pageId);
+    if (idx > -1) MOCK_NOTION_PAGES.splice(idx, 1);
+    delete MOCK_NOTION_CONTENT[pageId];
+    return { success: true };
+  }
+
+  try {
+    await notion.pages.update({
+      page_id: pageId,
+      archived: true
+    });
+    return { success: true };
+  } catch (error: any) {
+    console.error('Failed to delete Notion page:', error);
+    return { success: false, error: error.message };
+  }
+}
