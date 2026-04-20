@@ -8,6 +8,8 @@ import NotionNoteEditor from './widgets/NotionNoteEditor';
 import { createNotionPage } from '@/lib/actions/notion-actions';
 import { mutate } from 'swr';
 
+let notionWindow: Window | null = null;
+
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function NotionWidget({ limit = 100 }: { limit?: number }) {
@@ -90,10 +92,15 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
         
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <a 
-            href="https://www.notion.so"
-            target="NotionTab"
-            
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              if (notionWindow && !notionWindow.closed) {
+                notionWindow.focus();
+              } else {
+                notionWindow = window.open('https://www.notion.so', 'NotionTab');
+              }
+            }}
             className="hover-opacity"
             title="Open Notion"
             style={{ 
@@ -110,7 +117,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
             }}
           >
             <ExternalLink size={16} strokeWidth={2.5} /> Open Notion
-          </a>
+          </button>
 
           {/* View Mode Toggle */}
           <div style={{ 
@@ -296,7 +303,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.open(note.url, 'NotionTab');
+                  notionWindow = window.open(note.url, 'NotionTab');
                 }}
                 style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
                 title="Open in Notion"
