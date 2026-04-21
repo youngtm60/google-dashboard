@@ -1,15 +1,59 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { Loader2, Menu, Calendar } from 'lucide-react';
-import PomodoroWidget from './widgets/PomodoroWidget';
-import MiniCalendar from './widgets/MiniCalendar';
 import { useSidebar } from '@/lib/SidebarContext';
 
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function DashboardHeader() {
+  const [greeting, setGreeting] = useState('Hello');
+  const [dailySnark, setDailySnark] = useState('');
+
+  const snarkyComments = [
+    "Most of those are probably meetings that could have been emails.",
+    "The inbox isn't going to clear itself, Tim.",
+    "Is 'checking the dashboard' technically a task now?",
+    "Bold of you to assume you'll finish all those today.",
+    "Maybe one more Diet Coke will solve the task list problem.",
+    "The skip button doesn't work on real life, unfortunately.",
+    "Focus, Tim. The internet will still be there later.",
+    "Your tasks are starting to form a union. Watch out.",
+    "Efficiency is just a fancy word for 'doing it faster next time'.",
+    "That's a lot of unread mail. Have you tried turning it off and on again?",
+    "I'm sure you'll get to those tasks... eventually.",
+    "A clean inbox is a sign of a cluttered mind. Or something.",
+    "Don't look at me, I just display the numbers.",
+    "The tasks are patient. They'll be there tomorrow too.",
+    "Procrastination is just the art of keeping up with yesterday.",
+    "If 'Thinking about work' were a task, you'd be done by now.",
+    "Are you working hard, or just making the dashboard look busy?",
+    "Your inbox called. It's disappointed in you.",
+    "Rome wasn't built in a day, but they didn't have 50 unread emails.",
+    "Just pick one, Tim. Any one. It's better than staring.",
+    "That notification sound? That's the sound of more work.",
+    "You have enough tasks to keep a small village busy for a week.",
+    "I’d help you with those tasks, but I’m just a header component.",
+    "Deep breaths. The unread count is just a number. A big, scary number.",
+    "Maybe if you close your eyes, the emails will disappear. (They won't).",
+    "Statistics say 80% of those tasks are actually avoidable.",
+    "Look at all those tasks. You're practically a productivity machine.",
+    "If you finish all those today, I'll be genuinely impressed.",
+    "The dashboard is judging your tab-to-task ratio. It's not good."
+  ];
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good Morning');
+    else if (hour < 17) setGreeting('Good Afternoon');
+    else setGreeting('Good Evening');
+
+    const day = new Date().getDate();
+    setDailySnark(snarkyComments[day % snarkyComments.length]);
+  }, []);
+
   const { data: tasks, isLoading: tasksLoading } = useSWR('/api/workspace/tasks', fetcher, {
     refreshInterval: 1000 * 60 * 5,
   });
@@ -33,57 +77,41 @@ export default function DashboardHeader() {
     <header style={{ 
       display: "flex", 
       justifyContent: "space-between", 
-      alignItems: "flex-start", 
-      marginBottom: "32px",
-      padding: "10px 0"
+      alignItems: "center", 
+      marginBottom: "10px",
+      padding: "0 12px"
     }}>
-      <div>
+      <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
         <h1 style={{ 
-          fontSize: "2.8rem", 
+          fontSize: "2.2rem", 
           fontWeight: 800, 
           letterSpacing: "-0.5px",
-          marginBottom: "8px",
-          color: "var(--accent-primary)"
+          color: "var(--accent-primary)",
+          margin: 0
         }}>
-          Dashboard
+          {greeting}, Tim.
         </h1>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", minHeight: "24px" }}>
           {isLoading ? (
             <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", display: "flex", alignItems: "center", gap: "6px" }}>
-              Welcome back. Fetching your updates... <Loader2 size={12} className="animate-spin" />
+              Fetching your updates... <Loader2 size={12} className="animate-spin" />
             </p>
           ) : (
             <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-              Welcome back. You have <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{tasksText}</span> and <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{emailsText}</span>.
+              You have <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{tasksText}</span> and <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{emailsText}</span>.
+              {dailySnark && <span style={{ color: "var(--text-secondary)", fontStyle: "italic", marginLeft: "12px" }}>— {dailySnark}</span>}
             </p>
           )}
         </div>
       </div>
       
-      <div style={{ display: "flex", gap: "16px", alignItems: "stretch" }}>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
         
-        {/* Left Column Stack */}
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "flex-end" }}>
+        {/* Actions Row */}
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-end" }}>
           
-          {/* Date Button (Calendar Button) */}
-          <div style={{ 
-            background: 'var(--glass-bg)', 
-            padding: '8px 16px', 
-            borderRadius: '20px',
-            border: '1px solid var(--glass-border)',
-            fontSize: '0.9rem',
-            fontWeight: 500,
-            color: 'var(--text-primary)',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-            display: 'flex',
-            alignItems: 'center',
-            height: '38px'
-          }}>
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </div>
-
-          {/* Timer Row */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+          {/* Actions Row (Outlook, Nowsta, Date, Timer) */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             {/* Outlook Button */}
             <a
               href="https://outlook.cloud.microsoft/calendar/view/week"
@@ -138,14 +166,8 @@ export default function DashboardHeader() {
               <Menu size={16} />
               Nowsta
             </button>
-            
-            <PomodoroWidget />
           </div>
         </div>
-        
-        {/* Right Column */}
-        <MiniCalendar />
-
       </div>
     </header>
   );

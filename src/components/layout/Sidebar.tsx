@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { 
   LayoutDashboard, 
@@ -19,6 +20,10 @@ import {
   Bell
 } from "lucide-react";
 
+import MiniCalendar from "../widgets/MiniCalendar";
+
+import PomodoroWidget from "../widgets/PomodoroWidget";
+
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard, color: "var(--accent-primary)" },
   { href: "/calendar", label: "Calendar", icon: Calendar, color: "var(--accent-sky)" },
@@ -30,13 +35,41 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const [persistedPaths, setPersistedPaths] = useState<Record<string, string>>({});
+
+  // Capture and save current path to localStorage
+  useEffect(() => {
+    if (pathname && pathname !== '/') {
+      const baseRoute = '/' + pathname.split('/')[1];
+      const fullPath = window.location.pathname + window.location.search;
+      localStorage.setItem(`last_path_${baseRoute}`, fullPath);
+      
+      setPersistedPaths(prev => ({
+        ...prev,
+        [baseRoute]: fullPath
+      }));
+    }
+  }, [pathname, searchParams]);
+
+  // Load initial persisted paths
+  useEffect(() => {
+    const paths: Record<string, string> = {};
+    navItems.forEach(item => {
+      if (item.href !== '/') {
+        const saved = localStorage.getItem(`last_path_${item.href}`);
+        if (saved) paths[item.href] = saved;
+      }
+    });
+    setPersistedPaths(paths);
+  }, []);
 
   if (!session) return null;
 
   return (
     <aside className="sidebar-container">
-      <div style={{ marginBottom: "48px", display: "flex", alignItems: "center", gap: "12px" }}>
+      <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
         <div style={{ 
           background: "var(--accent-primary)", 
           width: "36px", 
@@ -55,15 +88,20 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: "4px" }}>
+      <div style={{ marginBottom: "24px", paddingLeft: "4px" }}>
+        <MiniCalendar />
+      </div>
+
+      <nav style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px" }}>
         {navItems.map((item, index) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/');
           const Icon = item.icon;
+          const href = persistedPaths[item.href] || item.href;
           
           return (
             <Link 
               key={item.href} 
-              href={item.href}
+              href={href}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -93,6 +131,12 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      <div style={{ marginBottom: "24px" }}>
+        <PomodoroWidget />
+      </div>
+
+      <div style={{ flex: 1 }}></div>
 
       <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "16px" }}>
         <div style={{ 

@@ -93,7 +93,7 @@ export default function GmailMessageDetail({ messageId, onBack, onNext, onPrevio
           className="hover-opacity"
           style={{ background: "transparent", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "8px", fontSize: "0.95rem", fontWeight: 500, padding: "8px 12px", borderRadius: "8px", border: "1px solid var(--glass-border)" }}
         >
-          <ArrowLeft size={18} /> Back to Dashboard
+          <ArrowLeft size={18} /> Back to Inbox
         </button>
         
         <div style={{ flex: 1 }} />

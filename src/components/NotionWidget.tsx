@@ -12,15 +12,45 @@ let notionWindow: Window | null = null;
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function NotionWidget({ limit = 100 }: { limit?: number }) {
+export default function NotionWidget({ 
+  initialLimit, 
+  showHeader = true, 
+  fullHeight = false,
+  viewMode: externalViewMode
+}: { 
+  initialLimit?: number, 
+  showHeader?: boolean, 
+  fullHeight?: boolean,
+  viewMode?: 'recent' | 'all'
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
+  const [internalViewMode, setInternalViewMode] = useState<'recent' | 'all'>('recent');
+  
+  const viewMode = externalViewMode || internalViewMode;
+  const setViewMode = externalViewMode ? (() => {}) : setInternalViewMode;
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [newNoteTitle, setNewNoteTitle] = useState('');
   const [newNoteNotebook, setNewNoteNotebook] = useState('Personal');
   const [showCreateForm, setShowCreateForm] = useState(false);
+
+  // Load persisted note ID on mount
+  useEffect(() => {
+    const savedId = localStorage.getItem('lastOpenedNotionNoteId');
+    if (savedId) {
+      setActiveNoteId(savedId);
+    }
+  }, []);
+
+  // Persist note ID when it changes
+  useEffect(() => {
+    if (activeNoteId) {
+      localStorage.setItem('lastOpenedNotionNoteId', activeNoteId);
+    } else {
+      localStorage.removeItem('lastOpenedNotionNoteId');
+    }
+  }, [activeNoteId]);
 
   const handleCreateNote = async () => {
     if (!newNoteTitle.trim()) return;
@@ -83,7 +113,8 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
   }
 
   return (
-    <section className="glass-panel" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
+    <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "20px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : "450px"}}>
+      {showHeader && (
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-amber)" }}>
           <Notebook size={20} />
@@ -156,7 +187,6 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
               All
             </button>
           </div>
-          
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
             className="hover-opacity"
@@ -175,8 +205,8 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
             <Plus size={16} />
           </button>
         </div>
-
       </div>
+      )}
 
       
       {showCreateForm && (
@@ -281,7 +311,11 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
         overflowY: "auto",
         paddingRight: "4px" 
       }}>
-        {isLoading && !notes ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} /></div> : finalNotes.map((note: any) => (
+        {isLoading && !notes ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} />
+          </div>
+        ) : finalNotes.slice(0, initialLimit).map((note: any) => (
           <div 
             key={note.id} 
             onClick={() => setActiveNoteId(note.id)}

@@ -13,10 +13,11 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const maxResults = parseInt(searchParams.get('maxResults') || '20');
   const calendarsParam = searchParams.get('calendars');
+  const timeMin = searchParams.get('timeMin') || undefined;
   const calendars = calendarsParam ? calendarsParam.split(',') : ['primary'];
 
   try {
-    const events = await getGoogleCalendarEvents((session as any).accessToken as string, maxResults, calendars);
+    const events = await getGoogleCalendarEvents((session as any).accessToken as string, maxResults, calendars, timeMin);
     return NextResponse.json(events);
   } catch (error: any) {
     const errMsg = error?.message || String(error) || 'Failed to fetch calendar events';

@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-import TodayWidget from '@/components/TodayWidget';
+import ScratchpadWidget from '@/components/ScratchpadWidget';
 import TasksWidget from '@/components/TasksWidget';
 import NotionWidget from '@/components/NotionWidget';
 import GmailWidget from '@/components/GmailWidget';
@@ -12,9 +12,9 @@ import DashboardHeader from '@/components/DashboardHeader';
 import LoginScreen from '@/components/auth/LoginScreen';
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions) as any;
 
-  if (!session) {
+  if (!session || session.error === "RefreshAccessTokenError") {
     return <LoginScreen />;
   }
 
@@ -24,7 +24,7 @@ export default async function Home() {
 
       {/* Widget Grid - Flat Layout using CSS Grid for auto wrapping */}
       <div className="dashboard-grid">
-        <TodayWidget />
+        <ScratchpadWidget />
         <CalendarWidget />
         <GmailWidget limit={10} />
         <TasksWidget />

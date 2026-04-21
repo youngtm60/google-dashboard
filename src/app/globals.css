@@ -134,7 +134,7 @@ button {
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 24px;
+  gap: 6px 12px; /* 6px row gap (75% reduction), 12px column gap (50% reduction) */
   align-items: start;
 }
 /* Responsive Layout */
@@ -158,7 +158,7 @@ button {
   flex: 1;
   min-width: 0;
   margin-left: var(--sidebar-width);
-  padding: 40px;
+  padding: 10px 12px 40px 12px;
   height: 100vh;
   overflow-y: auto;
   overflow-x: auto;

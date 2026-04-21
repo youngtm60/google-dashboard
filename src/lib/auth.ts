@@ -28,11 +28,10 @@ async function refreshAccessToken(token: any) {
       ...token,
       accessToken: refreshedTokens.access_token,
       expiresAt: Math.floor(Date.now() / 1000 + refreshedTokens.expires_in),
-      // Fall back to old refresh token if a new one isn't provided
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
     };
   } catch (error) {
-    console.error("Error refreshing access token", error);
+    console.log("Token refresh failed, forcing re-authentication");
     return {
       ...token,
       error: "RefreshAccessTokenError",
