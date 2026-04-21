@@ -164,6 +164,7 @@ function GmailPageContent() {
               fullHeight={true}
               externalIsComposing={isComposing}
               onResetComposing={() => setIsComposing(false)}
+              onStartComposing={() => setIsComposing(true)}
               viewMode={viewMode}
             />
           </Suspense>

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import CalendarWidget from "@/components/CalendarWidget";
 import { ArrowLeft, Calendar, Settings2, Plus } from "lucide-react";
 import Link from "next/link";
 
-export default function CalendarPage() {
+function CalendarPageContent() {
   const [viewMode, setViewMode] = useState<'recent' | 'all'>('all');
   const [showSettings, setShowSettings] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -161,8 +161,17 @@ export default function CalendarPage() {
           externalShowSettings={showSettings}
           externalIsCreating={isCreating}
           onResetCreating={() => setIsCreating(false)}
+          onStartCreating={() => setIsCreating(true)}
         />
       </div>
     </div>
+  );
+}
+
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: "center", padding: "40px" }}>Loading Calendar...</div>}>
+      <CalendarPageContent />
+    </Suspense>
   );
 }

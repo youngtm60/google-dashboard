@@ -17,6 +17,7 @@ export default function GmailWidget({
   fullHeight = false,
   externalIsComposing,
   onResetComposing,
+  onStartComposing,
   viewMode = 'all'
 }: { 
   limit?: number, 
@@ -25,6 +26,7 @@ export default function GmailWidget({
   fullHeight?: boolean,
   externalIsComposing?: boolean,
   onResetComposing?: () => void,
+  onStartComposing?: () => void,
   viewMode?: 'all' | 'unread'
 }) {
   const router = useRouter();
@@ -41,6 +43,7 @@ export default function GmailWidget({
   
   const [internalIsComposing, setInternalIsComposing] = useState(false);
   const isComposing = externalIsComposing !== undefined ? externalIsComposing : internalIsComposing;
+  const setIsComposing = externalIsComposing !== undefined ? (onStartComposing || (() => {})) : setInternalIsComposing;
 
   const handleResetComposing = () => {
     if (onResetComposing) {

@@ -45,7 +45,8 @@ export default function CalendarWidget({
   viewMode = 'all',
   externalShowSettings,
   externalIsCreating,
-  onResetCreating
+  onResetCreating,
+  onStartCreating
 }: { 
   initialLimit?: number, 
   showHeader?: boolean, 
@@ -54,7 +55,8 @@ export default function CalendarWidget({
   viewMode?: 'recent' | 'all',
   externalShowSettings?: boolean,
   externalIsCreating?: boolean,
-  onResetCreating?: () => void
+  onResetCreating?: () => void,
+  onStartCreating?: () => void
 }) {
   const [selectedCalendars, setSelectedCalendars] = useState<string[]>(['primary']);
   const [internalShowSettings, setInternalShowSettings] = useState(false);
@@ -65,6 +67,7 @@ export default function CalendarWidget({
 
   const [internalIsCreating, setInternalIsCreating] = useState(false);
   const isCreating = externalIsCreating !== undefined ? externalIsCreating : internalIsCreating;
+  const setIsCreating = externalIsCreating !== undefined ? (onStartCreating || (() => {})) : setInternalIsCreating;
   
   const handleCancelCreating = () => {
     if (onResetCreating) {

@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "Your centralized premium Google Workspace dashboard.",
 };
 
+import { Suspense } from "react";
+
 export default function RootLayout({
   children,
 }: {
@@ -24,9 +26,13 @@ export default function RootLayout({
         <SessionProvider>
           <SidebarProvider>
             <div style={{ display: "flex", minHeight: "100vh" }}>
-              <Sidebar />
+              <Suspense fallback={<div style={{ width: "280px" }} />}>
+                <Sidebar />
+              </Suspense>
               <main className="main-content">
-                {children}
+                <Suspense fallback={<div style={{ textAlign: "center", padding: "40px" }}>Loading...</div>}>
+                  {children}
+                </Suspense>
               </main>
               <NowstaSidebar />
             </div>
