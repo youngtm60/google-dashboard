@@ -33,7 +33,26 @@ export default function DashboardHeader() {
     "Just pick one, Tim. Any one. It's better than staring.",
     "That notification sound? That's the sound of more work.",
     "Deep breaths. The unread count is just a number. A big, scary number.",
-    "Statistics say 80% of those tasks are actually avoidable."
+    "Statistics say 80% of those tasks are actually avoidable.",
+    "Hitting refresh won't magically make the tasks disappear.",
+    "I see you added 'organize tasks' to the task list again.",
+    "Another day, another opportunity to push things to tomorrow.",
+    "Your caffeine-to-productivity ratio is looking a little skewed.",
+    "Staring at the screen doesn't count as getting things done.",
+    "Ah, the 'I'll just answer one email' trap. Good luck with that.",
+    "Remember when 'Inbox Zero' was a thing? Me neither.",
+    "Just mark them all as read. I won't tell anyone.",
+    "Maybe if you organize them by color, they won't look so intimidating.",
+    "Technically, taking a break is part of the creative process.",
+    "I'm routing 80% of your CPU to rendering this guilt trip.",
+    "Fun fact: 'To-Do' lists are just 'Didn't-Do' lists from yesterday.",
+    "I admire your optimism in setting those deadlines.",
+    "Blinking at the screen won't write the email for you.",
+    "If you ignore the tasks long enough, do they become features?",
+    "Legend has it someone once finished all their tasks. Just a legend, though.",
+    "Yes, checking your phone counts as a break. A very long one.",
+    "If stress burned calories, you'd be in incredible shape.",
+    "I give it 10 minutes before you switch tabs to YouTube."
   ];
 
   useEffect(() => {
