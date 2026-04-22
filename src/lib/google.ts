@@ -83,7 +83,8 @@ export async function getGoogleTasks(accessToken?: string) {
           due: task.due,
           updated: task.updated,
           listId: list.id,
-          listName: list.title
+          listName: list.title,
+          parentId: task.parent
         }));
       })
     );
@@ -159,7 +160,13 @@ export async function getGoogleCalendarList(accessToken?: string) {
   }
 }
 
-export async function getGoogleCalendarEvents(accessToken?: string, maxResults: number = 20, calendarIds: string[] = ['primary']) {
+export async function getGoogleCalendarEvents(
+  accessToken?: string, 
+  maxResults: number = 20, 
+  calendarIds: string[] = ['primary'],
+  timeMin?: string,
+  timeMax?: string
+) {
   if (IS_MOCK || !accessToken) {
     return MOCK_CALENDAR_EVENTS;
   }
@@ -175,8 +182,8 @@ export async function getGoogleCalendarEvents(accessToken?: string, maxResults: 
         try {
           const res = await calendar.events.list({
             calendarId: calId,
-            timeMin: new Date().toISOString(),
-            timeMax: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+            timeMin: timeMin || new Date().toISOString(),
+            timeMax: timeMax || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
             maxResults: maxResults > 20 ? maxResults : 150,
             singleEvents: true,
             orderBy: 'startTime',

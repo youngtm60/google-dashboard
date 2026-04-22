@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Loader2, Check } from 'lucide-react';
-import { getNotionPageBlocks, updateNotionBlock } from '@/lib/actions/notion-actions';
+import { ArrowLeft, Loader2, Check, Trash2 } from 'lucide-react';
+import { mutate } from 'swr';
+import { getNotionPageBlocks, updateNotionBlock, deleteNotionPage } from '@/lib/actions/notion-actions';
 
 interface NotionNoteEditorProps {
   note: any;
@@ -111,6 +112,20 @@ function BlockEditor({ block, onOpenSubPage }: { block: any, onOpenSubPage?: () 
 export default function NotionNoteEditor({ note, onBack }: NotionNoteEditorProps) {
   const [blocks, setBlocks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this note?')) return;
+    setIsDeleting(true);
+    const res = await deleteNotionPage(currentNote.id);
+    setIsDeleting(false);
+    if (res.success) {
+      mutate(key => typeof key === 'string' && key.startsWith('/api/workspace/notion'));
+      onBack();
+    } else {
+      alert("Failed to delete: " + res.error);
+    }
+  };
   
   // Navigation stack to drill down into sub-pages without losing original context
   const [currentNote, setCurrentNote] = useState(note);
@@ -153,9 +168,44 @@ export default function NotionNoteEditor({ note, onBack }: NotionNoteEditorProps
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-        <button 
-          onClick={handleBack}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflow: 'hidden' }}>
+          <button 
+            onClick={handleBack}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '28px',
+              height: '28px',
+              borderRadius: '8px',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid var(--glass-border)',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              flexShrink: 0
+            }}
+            className="hover-opacity"
+          >
+            <ArrowLeft size={16} />
+          </button>
+          <div style={{ overflow: 'hidden' }}>
+            {history.length > 0 && (
+              <div style={{ fontSize: '0.65rem', color: 'var(--accent-amber)', marginBottom: '2px', fontWeight: 600 }}>
+                {history[history.length - 1].title.length > 20 ? history[history.length - 1].title.substring(0, 20) + '...' : history[history.length - 1].title} /
+              </div>
+            )}
+            <h3 style={{ fontWeight: 600, fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {currentNote.icon} {currentNote.title}
+            </h3>
+          </div>
+        </div>
+
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="hover-opacity"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -163,26 +213,18 @@ export default function NotionNoteEditor({ note, onBack }: NotionNoteEditorProps
             width: '28px',
             height: '28px',
             borderRadius: '8px',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid var(--glass-border)',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
+            background: 'rgba(244, 63, 94, 0.1)',
+            border: '1px solid rgba(244, 63, 94, 0.2)',
+            color: 'var(--accent-rose)',
+            cursor: isDeleting ? 'default' : 'pointer',
+            opacity: isDeleting ? 0.5 : 1,
+            transition: 'all 0.2s',
+            flexShrink: 0
           }}
-          className="hover-opacity"
+          title="Delete Note"
         >
-          <ArrowLeft size={16} />
+          {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
         </button>
-        <div style={{ overflow: 'hidden' }}>
-          {history.length > 0 && (
-            <div style={{ fontSize: '0.65rem', color: 'var(--accent-amber)', marginBottom: '2px', fontWeight: 600 }}>
-              {history[history.length - 1].title.length > 20 ? history[history.length - 1].title.substring(0, 20) + '...' : history[history.length - 1].title} /
-            </div>
-          )}
-          <h3 style={{ fontWeight: 600, fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {currentNote.icon} {currentNote.title}
-          </h3>
-        </div>
       </div>
 
       {/* Editor Content Area */}

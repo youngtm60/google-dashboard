@@ -28,11 +28,10 @@ async function refreshAccessToken(token: any) {
       ...token,
       accessToken: refreshedTokens.access_token,
       expiresAt: Math.floor(Date.now() / 1000 + refreshedTokens.expires_in),
-      // Fall back to old refresh token if a new one isn't provided
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
     };
   } catch (error) {
-    console.error("Error refreshing access token", error);
+    console.log("Token refresh failed, forcing re-authentication");
     return {
       ...token,
       error: "RefreshAccessTokenError",
@@ -47,7 +46,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       authorization: {
         params: {
-          scope: "openid email profile https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/contacts.readonly",
+          scope: "openid email profile https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/contacts.other.readonly",
           prompt: "consent",
           access_type: "offline",
           response_type: "code",
@@ -56,6 +55,14 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      const allowedEmail = process.env.ALLOWED_EMAIL;
+      if (allowedEmail && user.email !== allowedEmail) {
+        console.log(`Access denied for email: ${user.email}`);
+        return false;
+      }
+      return true;
+    },
     async jwt({ token, account }) {
       // Initial sign in
       if (account) {

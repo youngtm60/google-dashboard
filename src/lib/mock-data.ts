@@ -38,6 +38,7 @@ export const MOCK_TASKS = [
   {
     id: "t2",
     title: "Review Google API quotas",
+    parentId: "t1",
     status: "needsAction",
     due: new Date().toISOString(),
   },

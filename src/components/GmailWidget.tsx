@@ -1,94 +1,167 @@
 'use client';
 
-import { useState } from 'react';
+import {  useState , useEffect } from 'react';
 import useSWR from 'swr';
-import { Send, Clock, Mail, Search, Plus } from 'lucide-react';
+import { Send, Clock, Mail, Search, Plus, Loader2, ExternalLink } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import WidgetSkeleton from './WidgetSkeleton';
 import GmailMessageDetail from './widgets/GmailMessageDetail';
 import GmailCompose from './widgets/GmailCompose';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function GmailWidget({ limit = 10 }: { limit?: number }) {
-    const [searchQuery, setSearchQuery] = useState('');
+export default function GmailWidget({ 
+  limit = 10, 
+  fullPage = false, 
+  showHeader = true, 
+  fullHeight = false,
+  externalIsComposing,
+  onResetComposing,
+  onStartComposing,
+  viewMode = 'all'
+}: { 
+  limit?: number, 
+  fullPage?: boolean, 
+  showHeader?: boolean, 
+  fullHeight?: boolean,
+  externalIsComposing?: boolean,
+  onResetComposing?: () => void,
+  onStartComposing?: () => void,
+  viewMode?: 'all' | 'unread'
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlMessageId = searchParams?.get('messageId');
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
   
-  // Navigation State
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
-  const [isComposing, setIsComposing] = useState(false);
+  const [internalIsComposing, setInternalIsComposing] = useState(false);
+  const isComposing = externalIsComposing !== undefined ? externalIsComposing : internalIsComposing;
+  const setIsComposing = externalIsComposing !== undefined ? (onStartComposing || (() => {})) : setInternalIsComposing;
+
+  const handleResetComposing = () => {
+    if (onResetComposing) {
+      onResetComposing();
+    } else {
+      setInternalIsComposing(false);
+    }
+  };
 
   // Use broader inbox fetch
-  const gmailQuery = 'label:INBOX';
-  const fetchLimit = 50;
+  const gmailQuery = viewMode === 'unread' ? 'is:unread' : 'label:INBOX';
+  const fetchLimit = fullPage ? 50 : limit;
 
   const { data: messages, isLoading } = useSWR(`/api/workspace/gmail?limit=${fetchLimit}&q=${encodeURIComponent(gmailQuery)}`, fetcher, {
     refreshInterval: 1000 * 60 * 5,
   });
 
-  if (isLoading) return <WidgetSkeleton />;
-
-  // Render Sub-Views If Active
-  if (isComposing) {
-    return (
-      <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: 0, height: "100%", display: "flex", flexDirection: "column" }}>
-        <GmailCompose onBack={() => setIsComposing(false)} />
-      </section>
-    );
-  }
-
-  if (selectedMessageId) {
-    return (
-      <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: 0, height: "100%", display: "flex", flexDirection: "column" }}>
-        <GmailMessageDetail messageId={selectedMessageId} onBack={() => setSelectedMessageId(null)} />
-      </section>
-    );
-  }
-
-  // Local filtering for search and sort by date
+    // Local filtering for search and sort by date
+  // MOVE THIS UP so we have access to it for the detail view
   const displayMessages = (messages || [])
     .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .filter((msg: any) => {
-    const q = searchQuery.toLowerCase();
+    const q = debouncedQuery.toLowerCase();
     return msg.subject.toLowerCase().includes(q) || 
            msg.from.toLowerCase().includes(q) ||
            msg.snippet.toLowerCase().includes(q);
   });
 
+  // Render Full Page Message Detail
+  if (fullPage && urlMessageId) {
+    const activeIndex = displayMessages.findIndex((m: any) => m.id === urlMessageId);
+    const nextMsgId = (activeIndex >= 0 && activeIndex < displayMessages.length - 1) ? displayMessages[activeIndex + 1].id : null;
+    const prevMsgId = (activeIndex > 0) ? displayMessages[activeIndex - 1].id : null;
+
+    return (
+      <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "40px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : (fullPage ? "100%" : "450px"), minHeight: "600px"}}>
+        <GmailMessageDetail 
+          messageId={urlMessageId} 
+          onBack={() => router.push('/gmail')}
+          onNext={nextMsgId ? () => router.push('/gmail?messageId=' + nextMsgId) : undefined}
+          onPrevious={prevMsgId ? () => router.push('/gmail?messageId=' + prevMsgId) : undefined}
+        />
+      </section>
+    );
+  }
+
+  // Render Sub-Views If Active
+  if (isComposing) {
+    return (
+      <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "24px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : (fullPage ? "100%" : "450px")}}>
+        <GmailCompose onBack={handleResetComposing} />
+      </section>
+    );
+  }
+
+  const handleEmailClick = (msgId: string) => {
+    router.push('/gmail?messageId=' + msgId);
+  };
+
   return (
-    <section className="glass-panel" style={{ padding: "24px", borderRadius: "24px", minHeight: 0, height: "100%", display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
-          <Mail size={20} />
-          <h3 style={{ fontWeight: 600 }}>Gmail Inbox</h3>
-          <button 
-            onClick={() => setIsComposing(true)}
-            className="hover-opacity"
-            title="Compose Email"
-            style={{ 
-              background: "rgba(255,255,255,0.1)", 
-              color: "white", 
-              width: "24px", 
-              height: "24px", 
-              borderRadius: "6px", 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              marginLeft: "4px"
-            }}
-          >
-            <Plus size={14} strokeWidth={3} />
-          </button>
+    <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "24px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : (fullPage ? "100%" : "450px")}}>
+      {showHeader && (
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
+            <Mail size={20} />
+            <h3 style={{ fontWeight: 600 }}>Gmail</h3>
+          </div>
+          
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* Action Buttons */}
+            <button 
+              onClick={() => window.open('https://mail.google.com', '_blank')}
+              className="hover-opacity"
+              style={{ 
+                background: "var(--accent-primary)", 
+                color: "white", 
+                border: "none", 
+                borderRadius: "10px", 
+                padding: "0 12px",
+                height: "32px", 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "6px",
+                cursor: "pointer",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}
+              title="Open official Gmail site"
+            >
+              <ExternalLink size={14} />
+              Open Gmail
+            </button>
+
+            <button 
+              onClick={() => setIsComposing(true)}
+              className="hover-opacity"
+              title="Compose Email"
+              style={{ 
+                background: "var(--accent-primary)", 
+                color: "white", 
+                padding: "0 12px",
+                height: "32px", 
+                borderRadius: "10px", 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "6px",
+                fontWeight: 600,
+                fontSize: "0.8rem",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+              }}
+            >
+              <Plus size={16} strokeWidth={3} /> Compose
+            </button>
+          </div>
         </div>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "none" /* hidden on mobile typically, let's keep it clean */ }}>
-            {messages?.filter((m: any) => m.isUnread).length} Unread
-          </span>
+      )}
 
-
-        </div>
-      </div>
-
-      <div style={{ position: "relative", marginBottom: "20px" }}>
+      <div style={{ position: "relative", marginBottom: "20px", flexShrink: 0 }}>
         <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
         <input
           type="text"
@@ -97,7 +170,7 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
           placeholder="Search emails, senders, or subjects..."
           style={{
             width: "100%",
-            background: "var(--bg-deep)",
+            background: "rgba(255,255,255,0.05)",
             border: "1px solid var(--glass-border)",
             borderRadius: "10px",
             padding: "8px 12px 8px 34px",
@@ -122,7 +195,7 @@ export default function GmailWidget({ limit = 10 }: { limit?: number }) {
         {displayMessages.map((msg: any) => (
           <div 
             key={msg.id} 
-            onClick={() => setSelectedMessageId(msg.id)} // Launch detail view
+            onClick={() => handleEmailClick(msg.id)}
             className="glass-card hover-opacity" 
             style={{ 
               padding: "14px 16px", 

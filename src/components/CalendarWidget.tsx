@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import useSWR from 'swr';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Calendar, 
   Search, 
@@ -10,7 +11,8 @@ import {
   Clock,
   Plus,
   Settings2,
-  Check
+  Check,
+  ExternalLink
 } from 'lucide-react';
 import CalendarEventDetail from './widgets/CalendarEventDetail';
 import CalendarEventCreate from './widgets/CalendarEventCreate';
@@ -35,10 +37,45 @@ interface CalendarInfo {
   colorId: string;
 }
 
-export default function CalendarWidget() {
+export default function CalendarWidget({ 
+  initialLimit, 
+  showHeader = true, 
+  fullHeight = false,
+  fullPage = false,
+  viewMode = 'all',
+  externalShowSettings,
+  externalIsCreating,
+  onResetCreating,
+  onStartCreating
+}: { 
+  initialLimit?: number, 
+  showHeader?: boolean, 
+  fullHeight?: boolean,
+  fullPage?: boolean,
+  viewMode?: 'recent' | 'all',
+  externalShowSettings?: boolean,
+  externalIsCreating?: boolean,
+  onResetCreating?: () => void,
+  onStartCreating?: () => void
+}) {
   const [selectedCalendars, setSelectedCalendars] = useState<string[]>(['primary']);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [internalShowSettings, setInternalShowSettings] = useState(false);
   const [calendarList, setCalendarList] = useState<CalendarInfo[]>([]);
+
+  const isSettingsOpen = externalShowSettings !== undefined ? externalShowSettings : internalShowSettings;
+  const setIsSettingsOpen = externalShowSettings !== undefined ? (() => {}) : setInternalShowSettings;
+
+  const [internalIsCreating, setInternalIsCreating] = useState(false);
+  const isCreating = externalIsCreating !== undefined ? externalIsCreating : internalIsCreating;
+  const setIsCreating = externalIsCreating !== undefined ? (onStartCreating || (() => {})) : setInternalIsCreating;
+  
+  const handleCancelCreating = () => {
+    if (onResetCreating) {
+      onResetCreating();
+    } else {
+      setInternalIsCreating(false);
+    }
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem('dash_selected_cal_ids');
@@ -68,33 +105,71 @@ export default function CalendarWidget() {
     }
   };
 
+  useEffect(() => {
+    if (isSettingsOpen && calendarList.length === 0) {
+      loadCalendars();
+    }
+  }, [isSettingsOpen, calendarList.length]);
+
   const toggleSettings = () => {
-    if (!isSettingsOpen && calendarList.length === 0) loadCalendars();
     setIsSettingsOpen(!isSettingsOpen);
   };
 
+  const timeMin = useMemo(() => {
+    const date = new Date();
+    if (viewMode === 'all') {
+      // Start of today
+      date.setHours(0, 0, 0, 0);
+    } else {
+      // Current time
+      date.setSeconds(0, 0);
+    }
+    return date.toISOString();
+  }, [viewMode]);
+
   const { data: events, error, isLoading } = useSWR<CalendarEvent[]>(
-    `/api/workspace/calendar?calendars=${encodeURIComponent(selectedCalendars.join(','))}`, 
+    `/api/workspace/calendar?calendars=${encodeURIComponent(selectedCalendars.join(','))}&timeMin=${encodeURIComponent(timeMin)}`, 
     fetcher, 
     { refreshInterval: 600000 }
   );
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeEventId, setActiveEventId] = useState<string | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlEventId = searchParams?.get('eventId');
+  const [internalActiveEventId, setInternalActiveEventId] = useState<string | null>(null);
+  const activeEventId = fullPage ? urlEventId : internalActiveEventId;
+
+  const setActiveEventId = (id: string | null) => {
+    if (fullPage) {
+      if (id) {
+        router.push(`/calendar?eventId=${id}`);
+      } else {
+        router.push('/calendar');
+      }
+    } else {
+      setInternalActiveEventId(id);
+    }
+  };
 
   const filteredEvents = useMemo(() => {
     if (!events || !Array.isArray(events)) return [];
     
     let filtered = events;
-    if (searchQuery) {
+    if (debouncedQuery) {
       filtered = filtered.filter(event => 
-        event.summary?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.location?.toLowerCase().includes(searchQuery.toLowerCase())
+        event.summary?.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+        event.location?.toLowerCase().includes(debouncedQuery.toLowerCase())
       );
     }
     return filtered;
-  }, [events, searchQuery]);
+  }, [events, debouncedQuery]);
 
   const formatTime = (dateTimeStr?: string) => {
     if (!dateTimeStr) return 'All Day';
@@ -109,8 +184,8 @@ export default function CalendarWidget() {
 
   if (isCreating) {
     return (
-      <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", flex: 1, height: "100%", minHeight: 0, display: "flex", flexDirection: "column" }}>
-        <CalendarEventCreate onBack={() => setIsCreating(false)} onSuccess={() => setIsCreating(false)} />
+      <section className={showHeader ? "glass-panel animate-fade-in" : "animate-fade-in"} style={{padding: showHeader ? "20px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : "450px"}}>
+        <CalendarEventCreate onBack={handleCancelCreating} onSuccess={handleCancelCreating} />
       </section>
     );
   }
@@ -119,7 +194,7 @@ export default function CalendarWidget() {
     const activeEvent = events.find((e: CalendarEvent) => e.id === activeEventId);
     if (activeEvent) {
       return (
-        <section className="glass-panel animate-fade-in" style={{ padding: "20px", borderRadius: "24px", height: "100%", minHeight: 0, display: "flex", flexDirection: "column" }}>
+        <section className={showHeader ? "glass-panel animate-fade-in" : "animate-fade-in"} style={{padding: showHeader ? "20px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : "450px"}}>
           <CalendarEventDetail event={activeEvent} onBack={() => setActiveEventId(null)} />
         </section>
       );
@@ -127,39 +202,86 @@ export default function CalendarWidget() {
   }
 
   return (
-    <section className="glass-panel animate-fade-in" style={{ 
-      padding: "20px", borderRadius: "24px", flex: 1, height: "100%", minHeight: 0, display: "flex", flexDirection: "column" 
-    }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-sky)" }}>
-          <Calendar size={20} />
-          <h3 style={{ fontWeight: 600 }}>Schedule</h3>
+    <section className={showHeader ? "glass-panel animate-fade-in" : "animate-fade-in"} style={{ padding: showHeader ? "20px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : "450px" }}>
+      {showHeader && (
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-sky)" }}>
+            <Calendar size={20} />
+            <h3 style={{ fontWeight: 600 }}>Calendar</h3>
+          </div>
+          
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <button 
+              onClick={() => window.open('https://calendar.google.com', '_blank')}
+              className="hover-opacity"
+              style={{ 
+                background: "var(--accent-sky)", 
+                color: "white", 
+                border: "none", 
+                borderRadius: "10px", 
+                padding: "0 12px",
+                height: "32px", 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "6px",
+                cursor: "pointer",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}
+              title="Open official Google Calendar"
+            >
+              <ExternalLink size={14} />
+              Open
+            </button>
+
+            <button 
+              onClick={toggleSettings}
+              className="hover-opacity"
+              style={{ 
+                background: "var(--accent-sky)", 
+                color: "white", 
+                border: "none", 
+                borderRadius: "10px", 
+                padding: "0 12px",
+                height: "32px", 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "6px",
+                cursor: "pointer",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}
+              title="Select Calendars"
+            >
+              <Settings2 size={14} />
+              Calendars
+            </button>
+
+            <button 
+              onClick={() => setIsCreating(true)}
+              className="hover-opacity"
+              style={{ 
+                background: "var(--accent-sky)", 
+                color: "white", 
+                border: "none", 
+                borderRadius: "10px", 
+                padding: "0 12px",
+                height: "32px", 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "6px",
+                cursor: "pointer",
+                fontSize: "0.8rem",
+                fontWeight: 600
+              }}
+              title="Add New Event"
+            >
+              <Plus size={16} />
+              Add
+            </button>
+          </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <button 
-            onClick={toggleSettings}
-            className="hover-opacity"
-            style={{ 
-              background: "rgba(255,255,255,0.05)", color: "white", border: "1px solid var(--glass-border)", 
-              borderRadius: "8px", padding: "4px", display: "flex", alignItems: "center", justifyContent: "center"
-            }}
-            title="Select Calendars"
-          >
-            <Settings2 size={16} />
-          </button>
-          <button 
-            onClick={() => setIsCreating(true)}
-            className="hover-opacity"
-            style={{ 
-              background: "var(--accent-primary)", color: "white", border: "none", borderRadius: "8px", 
-              padding: "4px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 10px rgba(129, 140, 248, 0.4)"
-            }}
-            title="Create new event"
-          >
-            <Plus size={16} />
-          </button>
-        </div>
-      </div>
+      )}
 
       {isSettingsOpen && (
         <div style={{ background: "var(--glass-border)", borderRadius: "12px", padding: "12px", marginBottom: "16px", border: "1px solid var(--glass-border)" }} className="animate-fade-in">
@@ -209,6 +331,10 @@ export default function CalendarWidget() {
       <div style={{ flex: 1, overflowY: "auto", paddingRight: "4px" }} className="custom-scrollbar">
         {isLoading ? (
           <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", textAlign: "center", marginTop: "20px" }}>Syncing schedule...</p>
+        ) : error ? (
+          <p style={{ color: "#ef4444", fontSize: "0.8rem", textAlign: "center", marginTop: "20px", padding: "10px" }}>
+            Failed to load schedule. Please try refreshing.
+          </p>
         ) : events && !Array.isArray(events) && (events as any).error ? (
           <p style={{ color: "#ef4444", fontSize: "0.8rem", textAlign: "center", marginTop: "20px", padding: "10px" }}>
             API Error: {(events as any).error}
@@ -219,7 +345,7 @@ export default function CalendarWidget() {
           </p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {filteredEvents.map((event, index) => (
+            {filteredEvents.slice(0, initialLimit).map((event, index) => (
               <div 
                 key={`${event.id}-${index}`}
                 onClick={() => setActiveEventId(event.id)}

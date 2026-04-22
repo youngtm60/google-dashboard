@@ -1,28 +1,62 @@
 'use client';
 
-import { useState } from 'react';
+import {  useState , useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckSquare, Check, Plus, Loader2, Search, Edit2, Trash2, X } from 'lucide-react';
 import { addTask, completeTask, editTaskTitle, deleteTask } from '@/lib/actions/task-actions';
 import WidgetSkeleton from './WidgetSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string }) {
+export default function TasksWidget({ 
+  initialLimit, 
+  showHeader = true, 
+  fullHeight = false,
+  viewMode: externalViewMode
+}: { 
+  initialLimit?: number, 
+  showHeader?: boolean, 
+  fullHeight?: boolean,
+  viewMode?: 'recent' | 'all'
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { mutate } = useSWRConfig();
+  
+  const urlQuery = searchParams?.get('q') || '';
+  const urlEditingId = searchParams?.get('editing') || null;
+
   const { data: tasks, isLoading } = useSWR('/api/workspace/tasks', fetcher, {
     refreshInterval: 1000 * 60 * 5,
   });
 
   const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
+  const [searchQuery, setSearchQuery] = useState(urlQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(urlQuery);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      if (showHeader && searchQuery !== urlQuery) {
+        const params = new URLSearchParams(window.location.search);
+        if (searchQuery) params.set('q', searchQuery);
+        else params.delete('q');
+        router.push(window.location.pathname + '?' + params.toString());
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [searchQuery, router, showHeader, urlQuery]);
+  
+  const [internalViewMode, setInternalViewMode] = useState<'recent' | 'all'>('all');
+  const viewMode = externalViewMode || internalViewMode;
+  const setViewMode = externalViewMode ? (() => {}) : setInternalViewMode;
   const [sortBy, setSortBy] = useState<'date' | 'alpha'>('date');
   
   // States for actions
   const [isAdding, setIsAdding] = useState(false);
   const [completingIds, setCompletingIds] = useState<string[]>([]);
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(urlEditingId);
   const [editTaskTitleText, setEditTaskTitleText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -56,6 +90,20 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
   const handleEditInit = (taskId: string, title: string) => {
     setEditingTaskId(taskId);
     setEditTaskTitleText(title);
+    if (showHeader) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('editing', taskId);
+      router.push(window.location.pathname + '?' + params.toString());
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingTaskId(null);
+    if (showHeader) {
+      const params = new URLSearchParams(window.location.search);
+      params.delete('editing');
+      router.push(window.location.pathname + '?' + params.toString());
+    }
   };
 
   const handleEditSave = async (taskId: string, listId: string) => {
@@ -64,7 +112,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
     const result = await editTaskTitle(taskId, listId, editTaskTitleText);
     if (result.success) {
       mutate('/api/workspace/tasks');
-      setEditingTaskId(null);
+      handleEditCancel();
     }
     setIsProcessing(false);
   };
@@ -79,11 +127,9 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
     setIsProcessing(false);
   };
 
-  if (isLoading) return <WidgetSkeleton />;
-
-  // Filter and Search logic
+    // Filter and Search logic
   let displayTasks = (tasks?.filter((t: any) => t.status !== 'completed') || []).filter((task: any) => {
-    const query = searchQuery.toLowerCase();
+    const query = debouncedQuery.toLowerCase();
     return task.title.toLowerCase().includes(query) || 
            (task.listName && task.listName.toLowerCase().includes(query));
   });
@@ -99,75 +145,92 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
     }
   });
 
-  const finalTasks = viewMode === 'recent' ? displayTasks.slice(0, 10) : displayTasks;
+  const finalTasks = viewMode === 'recent' ? displayTasks.slice(0, initialLimit || 10) : displayTasks;
 
   return (
-    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-secondary)" }}>
-          <CheckSquare size={18} />
-          <h3 style={{ fontWeight: 600, fontSize: "0.95rem" }}>Tasks</h3>
-        </div>
-        
-        {/* Sort & View Mode Toggles */}
-        <div style={{ display: "flex", gap: "8px" }}>
-          <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
-            <button 
-              onClick={() => setSortBy('date')}
-              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'date' ? "var(--accent-secondary)" : "transparent", color: sortBy === 'date' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
-            >
-              Date
-            </button>
-            <button 
-              onClick={() => setSortBy('alpha')}
-              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'alpha' ? "var(--accent-secondary)" : "transparent", color: sortBy === 'alpha' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
-            >
-              A-Z
-            </button>
+    <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "20px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : "450px"}}>
+      {showHeader && (
+        <>
+          {/* Header */}
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-cyan)" }}>
+              <CheckSquare size={20} />
+              <h3 style={{ fontWeight: 600 }}>Tasks</h3>
+            </div>
+            
+            {/* Sort & View Mode Toggles */}
+            <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
+                <button 
+                  onClick={() => setSortBy('date')}
+                  style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'date' ? "var(--accent-cyan)" : "transparent", color: sortBy === 'date' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+                >
+                  Date
+                </button>
+                <button 
+                  onClick={() => setSortBy('alpha')}
+                  style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: sortBy === 'alpha' ? "var(--accent-cyan)" : "transparent", color: sortBy === 'alpha' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+                >
+                  A-Z
+                </button>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
+                <button 
+                  onClick={() => { setViewMode('recent'); setSearchQuery(''); }}
+                  style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'recent' ? "var(--accent-cyan)" : "transparent", color: viewMode === 'recent' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+                >
+                  Recent
+                </button>
+                <button 
+                  onClick={() => { setViewMode('all'); setSearchQuery(''); }}
+                  style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'all' ? "var(--accent-cyan)" : "transparent", color: viewMode === 'all' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
+                >
+                  All
+                </button>
+              </div>
+            </div>
           </div>
-          <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
-            <button 
-              onClick={() => { setViewMode('recent'); setSearchQuery(''); }}
-              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'recent' ? "var(--accent-secondary)" : "transparent", color: viewMode === 'recent' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
-            >
-              Recent
-            </button>
-            <button 
-              onClick={() => { setViewMode('all'); setSearchQuery(''); }}
-              style={{ padding: "4px 10px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, background: viewMode === 'all' ? "var(--accent-secondary)" : "transparent", color: viewMode === 'all' ? "black" : "var(--text-muted)", transition: "all 0.2s" }}
-            >
-              All
-            </button>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
       {/* Input & Search */}
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
         <form onSubmit={handleAddTask} style={{ display: "flex", gap: "8px" }}>
           <input type="text" value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Quick add to My Tasks..." style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "8px 12px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none" }} />
-          <button type="submit" disabled={isAdding || !newTaskTitle.trim()} style={{ background: "var(--accent-secondary)", color: "white", width: "36px", height: "36px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", opacity: (isAdding || !newTaskTitle.trim()) ? 0.5 : 1 }}>
+          <button type="submit" disabled={isAdding || !newTaskTitle.trim()} style={{ background: "var(--accent-cyan)", color: "white", width: "36px", height: "36px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", opacity: (isAdding || !newTaskTitle.trim()) ? 0.5 : 1 }}>
             {isAdding ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
           </button>
         </form>
 
         <div style={{ position: "relative" }}>
           <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search tasks or lists..." style={{ width: "100%", background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "8px 12px 8px 34px", color: "var(--text-primary)", fontSize: "0.8rem", outline: "none" }} />
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search tasks or lists..." style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "8px 12px 8px 34px", color: "var(--text-primary)", fontSize: "0.8rem", outline: "none" }} />
         </div>
       </div>
 
       {/* Task List */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", overflowY: "auto", maxHeight: maxHeight, paddingRight: "4px", width: "100%" }} className="custom-scrollbar">
-        {finalTasks.map((task: any) => (
-          <div key={task.id} className="glass-card hover-opacity" style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyItems: "space-between", gap: "12px", flexShrink: 0, width: "100%" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", overflowY: "auto", paddingRight: "4px", width: "100%" }} className="custom-scrollbar">
+        {isLoading && !tasks ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} /></div> : (() => {
+          const topLevelTasks = finalTasks.filter((t: any) => !t.parentId || !finalTasks.some((p: any) => p.id === t.parentId));
+          const subTasksByParent = finalTasks.reduce((acc: any, t: any) => {
+            if (t.parentId) {
+              if (!acc[t.parentId]) acc[t.parentId] = [];
+              acc[t.parentId].push(t);
+            }
+            return acc;
+          }, {});
+
+          const renderTaskNode = (task: any, level: number = 0) => {
+            const children = subTasksByParent[task.id] || [];
+            return (
+              <div key={task.id} style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px' }}>
+                <div key={task.id} className="glass-card hover-opacity" style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyItems: "space-between", gap: "12px", flexShrink: 0, width: level > 0 ? `calc(100% - ${level * 24}px)` : "100%", marginLeft: level > 0 ? `${level * 24}px` : "0", borderLeft: level > 0 ? "3px solid var(--accent-cyan)" : undefined, opacity: level > 0 ? 0.9 : 1 }}>
             
             <button 
               onClick={() => toggleTask(task.id, task.listId, task.status)}
               disabled={completingIds.includes(task.id) || isProcessing}
               title="Complete Task"
-              style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2px solid", borderColor: task.status === 'completed' ? "var(--accent-secondary)" : "var(--glass-border)", background: task.status === 'completed' ? "var(--accent-secondary)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", opacity: completingIds.includes(task.id) ? 0.5 : 1, cursor: "pointer", flexShrink: 0 }}
+              style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2px solid", borderColor: task.status === 'completed' ? "var(--accent-cyan)" : "var(--glass-border)", background: task.status === 'completed' ? "var(--accent-cyan)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", opacity: completingIds.includes(task.id) ? 0.5 : 1, cursor: "pointer", flexShrink: 0 }}
             >
               {completingIds.includes(task.id) ? <Loader2 size={10} className="animate-spin" /> : task.status === 'completed' ? <Check size={12} strokeWidth={4} /> : null}
             </button>
@@ -182,12 +245,12 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleEditSave(task.id, task.listId);
-                      if (e.key === 'Escape') setEditingTaskId(null);
+                      if (e.key === 'Escape') handleEditCancel();
                     }}
-                    style={{ flex: 1, background: "rgba(255,255,255,0.1)", border: "1px solid var(--accent-secondary)", borderRadius: "6px", padding: "4px 8px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", minWidth: 0 }}
+                    style={{ flex: 1, background: "rgba(255,255,255,0.1)", border: "1px solid var(--accent-cyan)", borderRadius: "6px", padding: "4px 8px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", minWidth: 0 }}
                   />
-                  <button onClick={() => setEditingTaskId(null)} disabled={isProcessing} style={{ background: "transparent", color: "var(--text-muted)", cursor: "pointer" }}><X size={14} /></button>
-                  <button onClick={() => handleEditSave(task.id, task.listId)} disabled={isProcessing} style={{ background: "var(--accent-secondary)", color: "black", padding: "4px 8px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, cursor: isProcessing ? "wait" : "pointer" }}>
+                  <button onClick={() => handleEditCancel()} disabled={isProcessing} style={{ background: "transparent", color: "var(--text-muted)", cursor: "pointer" }}><X size={14} /></button>
+                  <button onClick={() => handleEditSave(task.id, task.listId)} disabled={isProcessing} style={{ background: "var(--accent-cyan)", color: "black", padding: "4px 8px", borderRadius: "6px", fontSize: "0.7rem", fontWeight: 600, cursor: isProcessing ? "wait" : "pointer" }}>
                     {isProcessing ? "..." : "Save"}
                   </button>
                 </div>
@@ -208,7 +271,7 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
                             setViewMode('all');
                           }}
                           style={{ 
-                            color: "var(--accent-secondary)",
+                            color: "var(--accent-cyan)",
                             background: "rgba(255,255,255,0.1)",
                             border: "1px solid rgba(255,255,255,0.05)",
                             padding: "2px 6px",
@@ -262,7 +325,13 @@ export default function TasksWidget({ maxHeight = "none" }: { maxHeight?: string
             )}
 
           </div>
-        ))}
+                {children.map((child: any) => renderTaskNode(child, level + 1))}
+              </div>
+            );
+          };
+
+          return topLevelTasks.map((task: any) => renderTaskNode(task, 0));
+        })()}
 
         {finalTasks.length === 0 && (
           <div style={{ textAlign: "center", color: "var(--text-muted)", padding: "40px 20px" }}>

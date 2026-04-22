@@ -117,22 +117,22 @@ export default function GmailCompose({ onBack }: GmailComposeProps) {
               onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
               placeholder="Name or recipient@example.com"
               required
-              style={{ background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%" }}
+              style={{ background: "white", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%" }}
             />
             {isLoadingContacts && (
                <Loader2 size={14} className="animate-spin" style={{ position: "absolute", right: "12px", top: "36px", color: "var(--text-muted)" }} />
             )}
             {showDropdown && suggestions.length > 0 && (
-              <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "rgba(20, 20, 25, 0.95)", backdropFilter: "blur(20px)", border: "1px solid var(--glass-border)", borderRadius: "10px", marginTop: "4px", padding: "4px", zIndex: 50, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", maxHeight: "150px", overflowY: "auto" }} className="custom-scrollbar">
+              <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "rgba(255, 255, 255, 0.95)", backdropFilter: "blur(20px)", border: "1px solid var(--glass-border)", borderRadius: "10px", marginTop: "4px", padding: "4px", zIndex: 50, boxShadow: "0 10px 30px rgba(0,0,0,0.5)", maxHeight: "150px", overflowY: "auto" }} className="custom-scrollbar">
                 {suggestions.map((contact, i) => (
                   <div 
                     key={i}
                     onClick={() => selectContact(contact)}
                     style={{ padding: "8px 10px", display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", borderRadius: "6px", transition: "background 0.2s" }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
+                    onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.05)"}
                     onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                   >
-                    <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: "50%", padding: "4px" }}>
+                    <div style={{ background: "rgba(0,0,0,0.05)", borderRadius: "50%", padding: "4px" }}>
                       <User size={12} color="var(--text-secondary)" />
                     </div>
                     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -152,7 +152,7 @@ export default function GmailCompose({ onBack }: GmailComposeProps) {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Meeting agenda..."
-              style={{ background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%" }}
+              style={{ background: "white", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%" }}
             />
           </div>
 
@@ -163,7 +163,7 @@ export default function GmailCompose({ onBack }: GmailComposeProps) {
               onChange={(e) => setBody(e.target.value)}
               required
               placeholder="Hi there,"
-              style={{ flex: 1, minHeight: "200px", background: "var(--bg-deep)", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "12px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%", resize: "none" }}
+              style={{ flex: 1, minHeight: "200px", background: "white", border: "1px solid var(--glass-border)", borderRadius: "10px", padding: "12px 14px", color: "var(--text-primary)", fontSize: "0.85rem", outline: "none", width: "100%", resize: "none" }}
             />
           </div>
 

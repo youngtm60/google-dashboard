@@ -1,13 +1,17 @@
 'use client';
 
+import { useState, useEffect, Suspense } from "react";
 import CalendarWidget from "@/components/CalendarWidget";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Settings2, Plus } from "lucide-react";
 import Link from "next/link";
 
-export default function CalendarPage() {
+function CalendarPageContent() {
+  const [showSettings, setShowSettings] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+
   return (
-    <div className="animate-fade-in" style={{ height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
-      <header style={{ marginBottom: "32px", flexShrink: 0 }}>
+    <div className="animate-fade-in" style={{ paddingBottom: "100px" }}>
+      <header style={{ marginBottom: "40px" }}>
         <Link 
           href="/" 
           style={{ 
@@ -33,9 +37,84 @@ export default function CalendarPage() {
         </p>
       </header>
 
-      <div style={{ flex: 1, minHeight: 0, paddingBottom: "40px" }}>
-        <CalendarWidget />
+      {/* Unified Scheduling Interface */}
+      <div className="glass-panel" style={{ padding: "32px", borderRadius: "32px" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "24px", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <Calendar size={24} color="var(--accent-sky)" />
+            <h2 style={{ fontSize: "1.2rem", fontWeight: 700 }}>
+              Upcoming Calendar
+            </h2>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+
+            {/* Action Buttons */}
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button 
+                onClick={() => setShowSettings(!showSettings)}
+                className="hover-opacity"
+                style={{ 
+                  background: "var(--accent-sky)", 
+                  color: "white", 
+                  border: "none", 
+                  borderRadius: "10px", 
+                  padding: "0 16px",
+                  height: "36px", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: "8px",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                  fontWeight: 600
+                }}
+              >
+                <Settings2 size={16} />
+                Calendars
+              </button>
+              <button 
+                onClick={() => setIsCreating(true)}
+                className="hover-opacity"
+                style={{ 
+                  background: "var(--accent-sky)", 
+                  color: "white", 
+                  border: "none", 
+                  borderRadius: "10px", 
+                  padding: "0 16px",
+                  height: "36px", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: "8px",
+                  cursor: "pointer",
+                  fontSize: "0.85rem",
+                  fontWeight: 600
+                }}
+              >
+                <Plus size={18} />
+                Add Event
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <CalendarWidget 
+          fullPage={true}
+          showHeader={false} 
+          fullHeight={true}
+          externalShowSettings={showSettings}
+          externalIsCreating={isCreating}
+          onResetCreating={() => setIsCreating(false)}
+          onStartCreating={() => setIsCreating(true)}
+        />
       </div>
     </div>
+  );
+}
+
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: "center", padding: "40px" }}>Loading Calendar...</div>}>
+      <CalendarPageContent />
+    </Suspense>
   );
 }

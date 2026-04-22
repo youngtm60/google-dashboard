@@ -8,17 +8,50 @@ import NotionNoteEditor from './widgets/NotionNoteEditor';
 import { createNotionPage } from '@/lib/actions/notion-actions';
 import { mutate } from 'swr';
 
+let notionWindow: Window | null = null;
+
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function NotionWidget({ limit = 100 }: { limit?: number }) {
+export default function NotionWidget({ 
+  initialLimit, 
+  showHeader = true, 
+  fullHeight = false,
+  viewMode: externalViewMode
+}: { 
+  initialLimit?: number, 
+  showHeader?: boolean, 
+  fullHeight?: boolean,
+  viewMode?: 'recent' | 'all'
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
+  const [internalViewMode, setInternalViewMode] = useState<'recent' | 'all'>('recent');
+  const [selectedNotebook, setSelectedNotebook] = useState<'All' | 'Personal' | 'BYU Notes'>('All');
+  
+  const viewMode = externalViewMode || internalViewMode;
+  const setViewMode = externalViewMode ? (() => {}) : setInternalViewMode;
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [newNoteTitle, setNewNoteTitle] = useState('');
   const [newNoteNotebook, setNewNoteNotebook] = useState('Personal');
   const [showCreateForm, setShowCreateForm] = useState(false);
+
+  // Load persisted note ID on mount
+  useEffect(() => {
+    const savedId = localStorage.getItem('lastOpenedNotionNoteId');
+    if (savedId) {
+      setActiveNoteId(savedId);
+    }
+  }, []);
+
+  // Persist note ID when it changes
+  useEffect(() => {
+    if (activeNoteId) {
+      localStorage.setItem('lastOpenedNotionNoteId', activeNoteId);
+    } else {
+      localStorage.removeItem('lastOpenedNotionNoteId');
+    }
+  }, [activeNoteId]);
 
   const handleCreateNote = async () => {
     if (!newNoteTitle.trim()) return;
@@ -42,7 +75,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
 
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 400);
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -50,14 +83,15 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
     refreshInterval: 1000 * 60 * 10, // 10 minutes polling
   });
 
-  if (isLoading) return <WidgetSkeleton />;
-
-  // We no longer need client-side filtering because notion.search handles full-text search!
-  const displayNotes = notes || [];
+    // We no longer need client-side filtering because notion.search handles full-text search!
+  const filteredByNotebook = (notes || []).filter((note: any) => {
+    if (selectedNotebook === 'All') return true;
+    return note.notebook === selectedNotebook;
+  });
 
   const finalNotes = viewMode === 'recent' 
-    ? displayNotes.slice(0, 10) 
-    : [...displayNotes].sort((a: any, b: any) => a.title.localeCompare(b.title));
+    ? filteredByNotebook.slice(0, 10) 
+    : [...filteredByNotebook].sort((a: any, b: any) => a.title.localeCompare(b.title));
 
   if (activeNoteId) {
     
@@ -69,7 +103,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
 
     if (activeNote) {
       return (
-        <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <section className="glass-panel" style={{padding: "20px", borderRadius: "24px", display: "flex", flexDirection: "column", height: "450px"}}>
           <NotionNoteEditor 
             note={activeNote} 
             onBack={() => {
@@ -83,7 +117,8 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
   }
 
   return (
-    <section className="glass-panel" style={{ padding: "20px", borderRadius: "24px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+    <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "20px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : "450px"}}>
+      {showHeader && (
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-amber)" }}>
           <Notebook size={20} />
@@ -92,6 +127,54 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
         
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              if (notionWindow && !notionWindow.closed) {
+                notionWindow.focus();
+              } else {
+                notionWindow = window.open('https://www.notion.so', 'NotionTab');
+              }
+            }}
+            className="hover-opacity"
+            title="Open Notion"
+            style={{ 
+              background: "#FCD34D", 
+              color: "white", 
+              padding: "6px 12px",
+              borderRadius: "8px", 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "6px",
+              fontWeight: 600,
+              fontSize: "0.85rem",
+              textDecoration: "none"
+            }}
+          >
+            <ExternalLink size={16} strokeWidth={2.5} /> Open Notion
+          </button>
+
+          {/* Notebook Filter */}
+          <select
+            value={selectedNotebook}
+            onChange={(e) => setSelectedNotebook(e.target.value as 'All' | 'Personal' | 'BYU Notes')}
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid var(--glass-border)",
+              color: "var(--text-primary)",
+              padding: "4px 8px",
+              borderRadius: "8px",
+              fontSize: "0.75rem",
+              outline: "none",
+              cursor: "pointer",
+              height: "28px"
+            }}
+          >
+            <option value="All">All Notebooks</option>
+            <option value="Personal">Personal</option>
+            <option value="BYU Notes">BYU Notes</option>
+          </select>
+
           {/* View Mode Toggle */}
           <div style={{ 
             background: "rgba(255,255,255,0.05)", 
@@ -129,10 +212,9 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
               All
             </button>
           </div>
-          
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="hover-opacity glass-card"
+            className="hover-opacity"
             style={{
               display: "flex",
               alignItems: "center",
@@ -140,19 +222,20 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
               width: "28px",
               height: "28px",
               borderRadius: "8px",
-              border: "1px solid var(--glass-border)",
-              color: "var(--accent-amber)"
+              border: "none",
+              background: "#FCD34D",
+              color: "white"
             }}
           >
             <Plus size={16} />
           </button>
         </div>
-
       </div>
+      )}
 
       
       {showCreateForm && (
-        <div style={{ marginBottom: "16px", background: "var(--bg-deep)", padding: "12px", borderRadius: "12px", border: "1px solid var(--glass-border)" }} className="animate-fade-in">
+        <div style={{ marginBottom: "16px", background: "rgba(255,255,255,0.05)", padding: "12px", borderRadius: "12px", border: "1px solid var(--glass-border)" }} className="animate-fade-in">
           <input
             type="text"
             value={newNoteTitle}
@@ -234,7 +317,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
           placeholder="Search notes or notebooks..."
           style={{
             width: "100%",
-            background: "var(--bg-deep)",
+            background: "rgba(255,255,255,0.05)",
             border: "1px solid var(--glass-border)",
             borderRadius: "10px",
             padding: "8px 12px 8px 34px",
@@ -253,7 +336,11 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
         overflowY: "auto",
         paddingRight: "4px" 
       }}>
-        {finalNotes.map((note: any) => (
+        {isLoading && !notes ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Loader2 size={24} className="animate-spin" style={{ color: "var(--text-muted)" }} />
+          </div>
+        ) : finalNotes.slice(0, initialLimit).map((note: any) => (
           <div 
             key={note.id} 
             onClick={() => setActiveNoteId(note.id)}
@@ -275,7 +362,7 @@ export default function NotionWidget({ limit = 100 }: { limit?: number }) {
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.open(note.url, '_blank', 'noopener,noreferrer');
+                  notionWindow = window.open(note.url, 'NotionTab');
                 }}
                 style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
                 title="Open in Notion"

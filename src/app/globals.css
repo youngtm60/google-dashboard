@@ -5,7 +5,7 @@ html {
 
 :root {
   /* Core Palette (Light Theme) */
-  --bg-deep: #f5f6f8; /* Soft off-white for the main background */
+  --bg-deep: #B2C0D4; /* Soft off-white for the main background */
   --bg-nebula: none; /* Removed the dark gradient */
   --foreground: #111827; /* Dark text */
   
@@ -48,7 +48,7 @@ html, body {
   background-attachment: fixed;
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 /* Scrollbar Styling */
@@ -128,4 +128,53 @@ button {
 
 .animate-fade-in {
   animation: fadeIn 0.5s ease forwards;
+}
+
+/* Responsive Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 6px 12px; /* 6px row gap (75% reduction), 12px column gap (50% reduction) */
+  align-items: start;
+}
+/* Responsive Layout */
+.sidebar-container {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 20px;
+  z-index: 50;
+  background: var(--glass-bg);
+  border-right: 1px solid var(--glass-border);
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  margin-left: var(--sidebar-width);
+  padding: 10px 12px 40px 12px;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: auto;
+  transition: margin-left 0.3s ease, padding 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .sidebar-container {
+    transform: translateX(-100%);
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+}
+
+.dashboard-grid > * {
+  min-width: 340px;
 }

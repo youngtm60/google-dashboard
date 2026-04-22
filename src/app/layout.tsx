@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionProvider from "@/components/auth/SessionProvider";
 import Sidebar from "@/components/layout/Sidebar";
+import { SidebarProvider } from "@/lib/SidebarContext";
+import NowstaSidebar from "@/components/layout/NowstaSidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,6 +12,8 @@ export const metadata: Metadata = {
   title: "Nebula Workspace | Google Dashboard",
   description: "Your centralized premium Google Workspace dashboard.",
 };
+
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -20,19 +24,19 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider>
-          <div style={{ display: "flex", minHeight: "100vh" }}>
-            <Sidebar />
-            <main style={{ 
-              flex: 1, 
-              marginLeft: "var(--sidebar-width)",
-              padding: "40px",
-              width: "100%",
-              height: "100vh",
-              overflowY: "auto"
-            }}>
-              {children}
-            </main>
-          </div>
+          <SidebarProvider>
+            <div style={{ display: "flex", minHeight: "100vh" }}>
+              <Suspense fallback={<div style={{ width: "280px" }} />}>
+                <Sidebar />
+              </Suspense>
+              <main className="main-content">
+                <Suspense fallback={<div style={{ textAlign: "center", padding: "40px" }}>Loading...</div>}>
+                  {children}
+                </Suspense>
+              </main>
+              <NowstaSidebar />
+            </div>
+          </SidebarProvider>
         </SessionProvider>
       </body>
     </html>

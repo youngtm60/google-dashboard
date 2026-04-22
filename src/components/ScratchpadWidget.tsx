@@ -1,44 +1,44 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Edit3, Trash2 } from 'lucide-react';
 import useSWR from 'swr';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-export default function TodayWidget() {
-  const { data, error, isLoading } = useSWR('/api/today', fetcher);
+export default function ScratchpadWidget() {
+  const { data, error, isLoading } = useSWR('/api/scratchpad', fetcher);
   const [notes, setNotes] = useState('');
-  const [isMounted, setIsMounted] = useState(false);
+  const isLoaded = useRef(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
-  // Load initial notes from API
+  // Load initial notes from API or LocalStorage
   useEffect(() => {
-    if (data?.notes !== undefined && !isMounted) {
-      setNotes(data.notes);
-      setIsMounted(true);
-    } else if (data?.fallback && !isMounted) {
-      // Local development fallback
-      const savedNotes = localStorage.getItem('nebula_today_notes');
-      if (savedNotes) setNotes(savedNotes);
-      setIsMounted(true);
+    if (data && !isLoaded.current) {
+      if (data.fallback) {
+        const savedNotes = localStorage.getItem('dash_scratchpad_notes');
+        if (savedNotes) setNotes(savedNotes);
+      } else if (data.notes !== undefined) {
+        setNotes(data.notes);
+      }
+      isLoaded.current = true;
     }
-  }, [data, isMounted]);
+  }, [data]);
 
   // Debounced save
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isLoaded.current) return;
 
     setSaveStatus('saving');
     
     // If fallback is active, also save to local storage
     if (data?.fallback) {
-      localStorage.setItem('nebula_today_notes', notes);
+      localStorage.setItem('dash_scratchpad_notes', notes);
     }
 
     const timeoutId = setTimeout(async () => {
       try {
-        await fetch('/api/today', {
+        await fetch('/api/scratchpad', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ notes }),
@@ -52,10 +52,10 @@ export default function TodayWidget() {
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [notes, isMounted, data?.fallback]);
+  }, [notes, data?.fallback]);
 
   const clearNotes = () => {
-    if (confirm("Clear Today's notes?")) {
+    if (confirm("Warning: This will permanently delete all your scratchpad notes. This action cannot be undone. Are you sure you want to proceed?")) {
       setNotes('');
     }
   };
@@ -64,23 +64,24 @@ export default function TodayWidget() {
     <section className="glass-panel" style={{ 
       padding: "20px", 
       borderRadius: "24px", 
-      minHeight: "300px", 
-      maxHeight: "400px", 
-      height: "100%", 
+      height: "450px", 
       display: "flex", 
       flexDirection: "column" 
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-rose)" }}>
           <Edit3 size={20} />
-          <h3 style={{ fontWeight: 600 }}>Today</h3>
+          <h3 style={{ fontWeight: 600 }}>Scratchpad</h3>
         </div>
         
         <button 
           onClick={clearNotes}
           className="hover-opacity"
           style={{ 
-            color: "var(--text-muted)",
+            color: "white",
+            background: "#FDA4AF",
+            padding: "4px 8px",
+            borderRadius: "6px",
             display: "flex",
             alignItems: "center",
             gap: "4px"
@@ -95,12 +96,12 @@ export default function TodayWidget() {
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder={isLoading ? "Loading your notes..." : "What's on your mind today? Type here for quick, persistent notes..."}
+          placeholder={isLoading ? "Loading your notes..." : "What's on your mind? Type here for quick, persistent notes..."}
           disabled={isLoading}
           style={{
             flex: 1,
             width: "100%",
-            background: "var(--bg-deep)",
+            background: "rgba(255,255,255,0.05)",
             border: "1px solid var(--glass-border)",
             borderRadius: "16px",
             padding: "16px",
@@ -122,7 +123,7 @@ export default function TodayWidget() {
         <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontStyle: "italic" }}>
           * Notes are persistent across your devices securely.
         </p>
-        {isMounted && (
+        {isLoaded.current && (
           <span style={{ fontSize: "0.65rem", color: saveStatus === 'saving' ? "var(--accent-secondary)" : "var(--text-muted)", fontWeight: 600 }}>
             {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Synced' : ''}
           </span>
