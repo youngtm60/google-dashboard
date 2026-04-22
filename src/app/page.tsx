@@ -151,6 +151,9 @@ export default function Home() {
           <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
             You have 4 upcoming tasks for today and 2 unread emails.
           </p>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: "4px", fontStyle: "italic", opacity: 0.8 }}>
+            (Don't pretend you're actually going to read those emails today.)
+          </p>
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>
           <button 
