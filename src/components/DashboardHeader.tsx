@@ -18,9 +18,7 @@ export default function DashboardHeader() {
     "Is 'checking the dashboard' technically a task now?",
     "Bold of you to assume you'll finish all those today.",
     "Maybe one more Diet Coke will solve the task list problem.",
-    "The skip button doesn't work on real life, unfortunately.",
     "Focus, Tim. The internet will still be there later.",
-    "Your tasks are starting to form a union. Watch out.",
     "Efficiency is just a fancy word for 'doing it faster next time'.",
     "That's a lot of unread mail. Have you tried turning it off and on again?",
     "I'm sure you'll get to those tasks... eventually.",
@@ -34,14 +32,8 @@ export default function DashboardHeader() {
     "Rome wasn't built in a day, but they didn't have 50 unread emails.",
     "Just pick one, Tim. Any one. It's better than staring.",
     "That notification sound? That's the sound of more work.",
-    "You have enough tasks to keep a small village busy for a week.",
-    "I’d help you with those tasks, but I’m just a header component.",
     "Deep breaths. The unread count is just a number. A big, scary number.",
-    "Maybe if you close your eyes, the emails will disappear. (They won't).",
-    "Statistics say 80% of those tasks are actually avoidable.",
-    "Look at all those tasks. You're practically a productivity machine.",
-    "If you finish all those today, I'll be genuinely impressed.",
-    "The dashboard is judging your tab-to-task ratio. It's not good."
+    "Statistics say 80% of those tasks are actually avoidable."
   ];
 
   useEffect(() => {
