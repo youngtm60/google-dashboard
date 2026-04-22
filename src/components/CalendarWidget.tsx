@@ -116,11 +116,14 @@ export default function CalendarWidget({
   };
 
   const timeMin = useMemo(() => {
-    const date = viewMode === 'all' 
-      ? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) 
-      : new Date();
-    // Round to the start of the minute to keep the SWR key stable
-    date.setSeconds(0, 0);
+    const date = new Date();
+    if (viewMode === 'all') {
+      // Start of today
+      date.setHours(0, 0, 0, 0);
+    } else {
+      // Current time
+      date.setSeconds(0, 0);
+    }
     return date.toISOString();
   }, [viewMode]);
 
