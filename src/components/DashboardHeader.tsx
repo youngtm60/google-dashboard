@@ -56,13 +56,24 @@ export default function DashboardHeader() {
   ];
 
   useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Good Morning');
-    else if (hour < 17) setGreeting('Good Afternoon');
-    else setGreeting('Good Evening');
+    const updateHeader = () => {
+      const now = new Date();
+      const hour = now.getHours();
+      
+      if (hour < 12) setGreeting('Good Morning');
+      else if (hour < 17) setGreeting('Good Afternoon');
+      else setGreeting('Good Evening');
 
-    const day = new Date().getDate();
-    setDailySnark(snarkyComments[day % snarkyComments.length]);
+      // Cycle the snarky comment every hour, incorporating the day so we don't repeat the same 24 every day
+      const snarkIndex = (now.getDate() * 24 + hour) % snarkyComments.length;
+      setDailySnark(snarkyComments[snarkIndex]);
+    };
+
+    updateHeader();
+    
+    // Check every minute in case the hour changes while the dashboard is open
+    const interval = setInterval(updateHeader, 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const { data: tasks, isLoading: tasksLoading } = useSWR('/api/workspace/tasks', fetcher, {
