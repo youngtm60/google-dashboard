@@ -26,6 +26,7 @@ export default function NotionWidget({
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [internalViewMode, setInternalViewMode] = useState<'recent' | 'all'>('recent');
+  const [selectedNotebook, setSelectedNotebook] = useState<'All' | 'Personal' | 'BYU Notes'>('All');
   
   const viewMode = externalViewMode || internalViewMode;
   const setViewMode = externalViewMode ? (() => {}) : setInternalViewMode;
@@ -83,11 +84,14 @@ export default function NotionWidget({
   });
 
     // We no longer need client-side filtering because notion.search handles full-text search!
-  const displayNotes = notes || [];
+  const filteredByNotebook = (notes || []).filter((note: any) => {
+    if (selectedNotebook === 'All') return true;
+    return note.notebook === selectedNotebook;
+  });
 
   const finalNotes = viewMode === 'recent' 
-    ? displayNotes.slice(0, 10) 
-    : [...displayNotes].sort((a: any, b: any) => a.title.localeCompare(b.title));
+    ? filteredByNotebook.slice(0, 10) 
+    : [...filteredByNotebook].sort((a: any, b: any) => a.title.localeCompare(b.title));
 
   if (activeNoteId) {
     
@@ -149,6 +153,27 @@ export default function NotionWidget({
           >
             <ExternalLink size={16} strokeWidth={2.5} /> Open Notion
           </button>
+
+          {/* Notebook Filter */}
+          <select
+            value={selectedNotebook}
+            onChange={(e) => setSelectedNotebook(e.target.value as 'All' | 'Personal' | 'BYU Notes')}
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid var(--glass-border)",
+              color: "var(--text-primary)",
+              padding: "4px 8px",
+              borderRadius: "8px",
+              fontSize: "0.75rem",
+              outline: "none",
+              cursor: "pointer",
+              height: "28px"
+            }}
+          >
+            <option value="All">All Notebooks</option>
+            <option value="Personal">Personal</option>
+            <option value="BYU Notes">BYU Notes</option>
+          </select>
 
           {/* View Mode Toggle */}
           <div style={{ 
