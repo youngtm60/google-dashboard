@@ -109,3 +109,27 @@ export async function deleteTask(taskId: string, listId: string) {
   }
 }
 
+export async function createTaskList(title: string) {
+  const session = await getServerSession(authOptions);
+  const accessToken = (session as any)?.accessToken;
+
+  if (IS_MOCK || !accessToken) {
+    return { success: true, mock: true };
+  }
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const tasks = google.tasks({ version: 'v1', auth });
+
+  try {
+    await tasks.tasklists.insert({
+      requestBody: { title },
+    });
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('Create Task List Error:', error);
+    return { success: false, error: 'Failed to create task list' };
+  }
+}
+

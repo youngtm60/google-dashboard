@@ -99,6 +99,26 @@ export async function getGoogleTasks(accessToken?: string) {
   }
 }
 
+export async function createGoogleTaskList(accessToken: string, title: string) {
+  if (IS_MOCK || !accessToken) {
+    return { id: 'mock-list-' + Date.now(), title };
+  }
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const tasksApi = google.tasks({ version: 'v1', auth });
+
+  try {
+    const res = await tasksApi.tasklists.insert({
+      requestBody: { title },
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Create Task List Error:', error);
+    throw error;
+  }
+}
+
 export async function getDriveFiles(accessToken?: string, query?: string) {
   if (IS_MOCK || !accessToken) {
     if (query) {

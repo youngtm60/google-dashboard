@@ -4,7 +4,7 @@ import {  useState , useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckSquare, Check, Plus, Loader2, Search, Edit2, Trash2, X } from 'lucide-react';
-import { addTask, completeTask, editTaskTitle, deleteTask } from '@/lib/actions/task-actions';
+import { addTask, completeTask, editTaskTitle, deleteTask, createTaskList } from '@/lib/actions/task-actions';
 import WidgetSkeleton from './WidgetSkeleton';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -52,6 +52,10 @@ export default function TasksWidget({
   const viewMode = externalViewMode || internalViewMode;
   const setViewMode = externalViewMode ? (() => {}) : setInternalViewMode;
   const [sortBy, setSortBy] = useState<'date' | 'alpha'>('date');
+  const [selectedList, setSelectedList] = useState('all');
+  
+  // Extract unique list names
+  const uniqueLists = Array.from(new Set(tasks?.map((t: any) => t.listName || 'My Tasks') || [])) as string[];
   
   // States for actions
   const [isAdding, setIsAdding] = useState(false);
@@ -59,6 +63,10 @@ export default function TasksWidget({
   const [editingTaskId, setEditingTaskId] = useState<string | null>(urlEditingId);
   const [editTaskTitleText, setEditTaskTitleText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // List creation state
+  const [isCreatingList, setIsCreatingList] = useState(false);
+  const [newListName, setNewListName] = useState('');
 
   const toggleTask = async (taskId: string, listId: string, currentStatus: string) => {
     if (completingIds.includes(taskId)) return;
@@ -127,11 +135,31 @@ export default function TasksWidget({
     setIsProcessing(false);
   };
 
+  const handleCreateList = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newListName.trim() || isProcessing) return;
+    
+    setIsProcessing(true);
+    const result = await createTaskList(newListName);
+    if (result.success) {
+      setNewListName('');
+      setIsCreatingList(false);
+      mutate('/api/workspace/tasks');
+    } else {
+      alert(result.error || "Failed to create list");
+    }
+    setIsProcessing(false);
+  };
+
     // Filter and Search logic
   let displayTasks = (tasks?.filter((t: any) => t.status !== 'completed') || []).filter((task: any) => {
     const query = debouncedQuery.toLowerCase();
-    return task.title.toLowerCase().includes(query) || 
+    const matchesSearch = task.title.toLowerCase().includes(query) || 
            (task.listName && task.listName.toLowerCase().includes(query));
+    
+    const matchesList = selectedList === 'all' || (task.listName || 'My Tasks') === selectedList;
+    
+    return matchesSearch && matchesList;
   });
 
   // Apply sorting
@@ -159,7 +187,85 @@ export default function TasksWidget({
             </div>
             
             {/* Sort & View Mode Toggles */}
-            <div style={{ display: "flex", gap: "8px" }}>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              {/* List Filter Dropdown */}
+              {!isCreatingList ? (
+                <>
+                  <select 
+                    value={selectedList}
+                    onChange={(e) => setSelectedList(e.target.value)}
+                    style={{ 
+                      background: "rgba(255,255,255,0.05)", 
+                      border: "1px solid var(--glass-border)", 
+                      borderRadius: "8px", 
+                      padding: "4px 8px", 
+                      fontSize: "0.7rem", 
+                      color: "var(--text-muted)", 
+                      outline: "none",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <option value="all">All Lists</option>
+                    {uniqueLists.map(list => (
+                      <option key={list} value={list}>{list}</option>
+                    ))}
+                  </select>
+                  <button 
+                    onClick={() => setIsCreatingList(true)}
+                    className="hover-opacity"
+                    style={{ 
+                      background: "rgba(255,255,255,0.05)", 
+                      border: "1px solid var(--glass-border)", 
+                      borderRadius: "8px", 
+                      width: "28px", 
+                      height: "28px", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      justifyContent: "center",
+                      color: "var(--text-muted)",
+                      cursor: "pointer"
+                    }}
+                    title="Create New List"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </>
+              ) : (
+                <form onSubmit={handleCreateList} style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                  <input 
+                    type="text" 
+                    value={newListName} 
+                    onChange={(e) => setNewListName(e.target.value)} 
+                    placeholder="New list name..."
+                    autoFocus
+                    style={{ 
+                      background: "rgba(255,255,255,0.1)", 
+                      border: "1px solid var(--accent-cyan)", 
+                      borderRadius: "6px", 
+                      padding: "4px 8px", 
+                      color: "var(--text-primary)", 
+                      fontSize: "0.7rem", 
+                      outline: "none",
+                      width: "120px"
+                    }}
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={!newListName.trim() || isProcessing}
+                    style={{ background: "var(--accent-cyan)", color: "black", border: "none", borderRadius: "4px", padding: "4px 8px", fontSize: "0.65rem", fontWeight: 700, cursor: "pointer" }}
+                  >
+                    {isProcessing ? "..." : "Create"}
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setIsCreatingList(false)}
+                    style={{ background: "transparent", color: "var(--text-muted)", border: "none", cursor: "pointer" }}
+                  >
+                    <X size={14} />
+                  </button>
+                </form>
+              )}
+
               <div style={{ background: "rgba(255,255,255,0.05)", padding: "2px", borderRadius: "8px", display: "flex", border: "1px solid var(--glass-border)" }}>
                 <button 
                   onClick={() => setSortBy('date')}
