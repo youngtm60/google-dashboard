@@ -24,7 +24,7 @@ export default function NowstaSidebar() {
       }}
     >
       <div style={{ width: '950px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e5e7eb' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e5e7eb', gap: '12px' }}>
           <a 
             href="https://app.nowsta.com" 
             target="_blank" 
