@@ -25,25 +25,44 @@ export default function NowstaSidebar() {
     >
       <div style={{ width: '950px', height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e5e7eb' }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#111827' }}>Nowsta</h2>
+          <a 
+            href="https://app.nowsta.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              background: '#319AB5', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '20px', 
+              padding: '8px 16px', 
+              fontSize: '0.9rem', 
+              fontWeight: 600, 
+              textDecoration: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#29829A'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#319AB5'}
+          >
+            Open Nowsta
+          </a>
           <button 
             onClick={closeNowsta}
             style={{ 
-              background: 'transparent', 
+              background: '#319AB5', 
+              color: 'white', 
               border: 'none', 
+              borderRadius: '20px', 
+              padding: '8px 16px', 
+              fontSize: '0.9rem', 
+              fontWeight: 600, 
               cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#6b7280',
               transition: 'background-color 0.2s'
             }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#29829A'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#319AB5'}
           >
-            <X size={20} />
+            Close
           </button>
         </div>
         <div style={{ flex: 1, backgroundColor: '#f9fafb' }}>
