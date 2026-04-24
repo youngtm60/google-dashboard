@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { useSidebar } from "@/lib/SidebarContext";
 import { 
   LayoutDashboard, 
   Mail, 
@@ -34,6 +35,7 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+  const { isNowstaOpen } = useSidebar();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { data: session } = useSession();
@@ -68,7 +70,13 @@ export default function Sidebar() {
   if (!session) return null;
 
   return (
-    <aside className="sidebar-container">
+    <aside 
+      className="sidebar-container"
+      style={{
+        transform: isNowstaOpen ? "translateX(-100%)" : "translateX(0)",
+        transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+      }}
+    >
       <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
         <div style={{ 
           background: "var(--accent-primary)", 

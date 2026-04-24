@@ -11,7 +11,7 @@ export default function NowstaSidebar() {
   return (
     <div 
       style={{
-        width: isOpen ? '675px' : '0px',
+        width: isOpen ? '950px' : '0px',
         height: '100vh',
         backgroundColor: '#ffffff',
         borderLeft: isOpen ? '1px solid var(--glass-border)' : 'none',
@@ -23,7 +23,7 @@ export default function NowstaSidebar() {
         zIndex: 10
       }}
     >
-      <div style={{ width: '675px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '950px', height: '100%', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #e5e7eb' }}>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#111827' }}>Nowsta</h2>
           <button 

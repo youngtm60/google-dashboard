@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 
 import { Suspense } from "react";
 
+import MainContent from "@/components/layout/MainContent";
+
 export default function RootLayout({
   children,
 }: {
@@ -29,11 +31,11 @@ export default function RootLayout({
               <Suspense fallback={<div style={{ width: "280px" }} />}>
                 <Sidebar />
               </Suspense>
-              <main className="main-content">
+              <MainContent>
                 <Suspense fallback={<div style={{ textAlign: "center", padding: "40px" }}>Loading...</div>}>
                   {children}
                 </Suspense>
-              </main>
+              </MainContent>
               <NowstaSidebar />
             </div>
           </SidebarProvider>
