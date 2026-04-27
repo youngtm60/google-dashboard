@@ -93,7 +93,7 @@ export default function GmailMessageDetail({ messageId, onBack, onNext, onPrevio
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", overflow: "hidden" }}>
       {/* Top Action Bar */}
-      <div style={{ display: "flex", alignItems: "center", justifyItems: "space-between", marginBottom: "24px", width: "100%", flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyItems: "space-between", marginBottom: "12px", width: "100%", flexShrink: 0 }}>
         <button 
           onClick={onBack}
           className="hover-opacity"
@@ -148,8 +148,8 @@ export default function GmailMessageDetail({ messageId, onBack, onNext, onPrevio
       </div>
 
       {/* Email Header Info */}
-      <div style={{ marginBottom: "20px", borderBottom: "1px solid var(--glass-border)", paddingBottom: "16px", flexShrink: 0 }}>
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "12px", lineHeight: 1.3 }}>{details.subject}</h2>
+      <div style={{ marginBottom: "12px", borderBottom: "1px solid var(--glass-border)", paddingBottom: "12px", flexShrink: 0 }}>
+        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "8px", lineHeight: 1.3 }}>{details.subject}</h2>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px" }}>
           <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis" }}>
             {details.from}
