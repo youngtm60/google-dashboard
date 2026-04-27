@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import { Loader2, Menu, Calendar } from 'lucide-react';
+import { Loader2, Menu, Calendar, ExternalLink } from 'lucide-react';
 import { useSidebar } from '@/lib/SidebarContext';
 
 
@@ -233,7 +233,7 @@ export default function DashboardHeader() {
         </div>
       </div>
       
-      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center", marginRight: "20px" }}>
         
         {/* Actions Row */}
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-end" }}>
@@ -265,15 +265,16 @@ export default function DashboardHeader() {
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#005A9E'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0078D4'}
             >
-              <Calendar size={16} />
+              <ExternalLink size={16} strokeWidth={2.5} />
               Outlook
             </a>
             
             {/* Nowsta Button */}
             <button
               onClick={toggleNowsta}
+              className="hover-opacity"
               style={{
-                background: '#319AB5',
+                background: 'var(--accent-primary)',
                 border: 'none',
                 borderRadius: '20px',
                 padding: '8px 16px',
@@ -285,11 +286,8 @@ export default function DashboardHeader() {
                 color: 'white',
                 cursor: 'pointer',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-                transition: 'background-color 0.2s',
                 height: '38px'
               }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#29829A'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#319AB5'}
             >
               <Menu size={16} />
               Nowsta
