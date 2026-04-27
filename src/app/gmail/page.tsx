@@ -155,7 +155,7 @@ function GmailPageContent() {
           </div>
         </div>
 
-        <div style={{ minHeight: "600px" }}>
+        <div style={{ minHeight: "1000px" }}>
           <Suspense fallback={<div style={{ textAlign: "center", padding: "40px" }}>Loading Inbox...</div>}>
             <GmailWidget 
               limit={50} 

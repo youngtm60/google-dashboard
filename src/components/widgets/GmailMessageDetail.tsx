@@ -51,11 +51,17 @@ export default function GmailMessageDetail({ messageId, onBack, onNext, onPrevio
     }
 
     if (result.success) {
-      // Revalidate any cached gmail query
+      // Optimistically remove the item from the cache to prevent Gmail API's delayed search index 
+      // from returning the item again if we revalidated immediately.
       mutate(
         (key: string) => typeof key === 'string' && key.startsWith('/api/workspace/gmail'),
-        undefined,
-        { revalidate: true }
+        (currentData: any) => {
+          if (Array.isArray(currentData)) {
+            return currentData.filter((msg: any) => msg.id !== messageId);
+          }
+          return currentData;
+        },
+        { revalidate: false }
       );
       onBack();
     } else {
@@ -158,6 +164,14 @@ export default function GmailMessageDetail({ messageId, onBack, onNext, onPrevio
       {/* We apply a very simple white box for the email body because emails usually assume a light background */}
       <div 
         className="custom-scrollbar"
+        onClick={(e) => {
+          const target = e.target as HTMLElement;
+          const anchor = target.closest('a');
+          if (anchor && anchor.href) {
+            e.preventDefault();
+            window.open(anchor.href, '_blank', 'noopener,noreferrer');
+          }
+        }}
         style={{ 
           flex: 1, 
           overflowY: "auto", 

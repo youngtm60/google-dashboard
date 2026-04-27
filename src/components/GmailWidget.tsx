@@ -57,13 +57,12 @@ export default function GmailWidget({
   // Construct API query
   let apiQuery = folder === 'inbox' ? 'label:INBOX' : '-in:spam -in:trash';
   if (viewMode === 'unread') {
-    apiQuery = 'is:unread';
+    apiQuery = 'is:unread in:inbox';
   }
   
   if (debouncedQuery) {
     apiQuery = apiQuery ? `${apiQuery} ${debouncedQuery}` : debouncedQuery;
   }
-
   const fetchLimit = fullPage ? 50 : limit;
 
   const { data: messages, isLoading } = useSWR(`/api/workspace/gmail?limit=${fetchLimit}&q=${encodeURIComponent(apiQuery)}`, fetcher, {
@@ -81,7 +80,7 @@ export default function GmailWidget({
     const prevMsgId = (activeIndex > 0) ? displayMessages[activeIndex - 1].id : null;
 
     return (
-      <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "40px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : (fullPage ? "100%" : "450px"), minHeight: "600px"}}>
+      <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "40px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "1000px" : (fullPage ? "100%" : "450px"), minHeight: "1000px"}}>
         <GmailMessageDetail 
           messageId={urlMessageId} 
           onBack={() => router.push('/gmail')}
@@ -95,7 +94,7 @@ export default function GmailWidget({
   // Render Sub-Views If Active
   if (isComposing) {
     return (
-      <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "24px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : (fullPage ? "100%" : "450px")}}>
+      <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "24px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "1000px" : (fullPage ? "100%" : "450px")}}>
         <GmailCompose onBack={handleResetComposing} />
       </section>
     );
@@ -106,7 +105,7 @@ export default function GmailWidget({
   };
 
   return (
-    <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "24px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : (fullPage ? "100%" : "450px")}}>
+    <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "24px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "1000px" : (fullPage ? "100%" : "450px")}}>
       {showHeader && (
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>

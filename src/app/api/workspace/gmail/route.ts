@@ -6,7 +6,7 @@ import { getGmailMessages } from '@/lib/google';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get('limit') || '20');
-  const query = searchParams.get('q') || 'is:unread';
+  const query = searchParams.get('q') || 'label:INBOX';
   
   const session = await getServerSession(authOptions);
 
