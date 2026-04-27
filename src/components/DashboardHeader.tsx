@@ -180,19 +180,19 @@ export default function DashboardHeader() {
     refreshInterval: 1000 * 60 * 5,
   });
 
-  const { data: messages, isLoading: messagesLoading } = useSWR('/api/workspace/gmail?limit=50&q=is:unread', fetcher, {
+  const { data: emailData, isLoading: emailsLoading } = useSWR('/api/workspace/gmail/count', fetcher, {
     refreshInterval: 1000 * 60 * 5,
   });
 
   const { toggleNowsta } = useSidebar();
 
-  const isLoading = tasksLoading || messagesLoading;
+  const isLoading = tasksLoading || emailsLoading;
   
   // Calculate counts
   const activeTasksCount = tasks ? tasks.filter((t: any) => t.status !== 'completed').length : 0;
-  const unreadEmailsCount = messages && Array.isArray(messages) ? messages.length : 0;
+  const unreadEmailsCount = emailData?.unreadCount || 0;
   
-  const emailsText = unreadEmailsCount >= 50 ? '50+ unread emails' : `${unreadEmailsCount} unread email${unreadEmailsCount !== 1 ? 's' : ''}`;
+  const emailsText = `${unreadEmailsCount} unread email${unreadEmailsCount !== 1 ? 's' : ''}`;
   const tasksText = `${activeTasksCount} active task${activeTasksCount !== 1 ? 's' : ''}`;
 
   return (

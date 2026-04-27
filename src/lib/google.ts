@@ -52,6 +52,27 @@ export async function getGmailMessages(accessToken?: string, maxResults: number 
   }
 }
 
+export async function getGmailUnreadCount(accessToken?: string) {
+  if (IS_MOCK || !accessToken) {
+    return MOCK_EMAILS.filter(e => e.isUnread).length;
+  }
+
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: accessToken });
+  const gmail = google.gmail({ version: 'v1', auth });
+
+  try {
+    const res = await gmail.users.labels.get({
+      userId: 'me',
+      id: 'UNREAD',
+    });
+    return res.data.messagesUnread || 0;
+  } catch (error) {
+    console.error('Gmail API Error (Unread Count):', error);
+    return 0;
+  }
+}
+
 export async function getGoogleTasks(accessToken?: string) {
   if (IS_MOCK || !accessToken) {
     return MOCK_TASKS;
