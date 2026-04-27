@@ -26,12 +26,12 @@ import MiniCalendar from "../widgets/MiniCalendar";
 import PomodoroWidget from "../widgets/PomodoroWidget";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard, color: "var(--accent-primary)" },
-  { href: "/calendar", label: "Calendar", icon: Calendar, color: "var(--accent-sky)" },
-  { href: "/drive", label: "Drive", icon: HardDrive, color: "var(--accent-emerald)" },
-  { href: "/gmail", label: "Gmail", icon: Mail, color: "#4A5568" },
-  { href: "/notion", label: "Notes", icon: Notebook, color: "var(--accent-amber)" },
-  { href: "/tasks", label: "Tasks", icon: CheckSquare, color: "var(--accent-cyan)" },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard, color: "var(--text-primary)" },
+  { href: "/calendar", label: "Calendar", icon: Calendar, color: "var(--text-primary)" },
+  { href: "/drive", label: "Drive", icon: HardDrive, color: "var(--text-primary)" },
+  { href: "/gmail", label: "Gmail", icon: Mail, color: "var(--text-primary)" },
+  { href: "/notion", label: "Notes", icon: Notebook, color: "var(--text-primary)" },
+  { href: "/tasks", label: "Tasks", icon: CheckSquare, color: "var(--text-primary)" },
 ];
 
 export default function Sidebar() {
