@@ -34,8 +34,9 @@ function GmailPageContent() {
             display: "inline-flex", 
             alignItems: "center", 
             gap: "8px", 
-            color: "var(--text-muted)",
+            color: "#000",
             fontSize: "0.9rem",
+            fontWeight: 700,
             marginBottom: "16px",
             textDecoration: "none"
           }}

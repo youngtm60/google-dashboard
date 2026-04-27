@@ -26,7 +26,7 @@ export default async function Home() {
       <div className="dashboard-grid">
         <ScratchpadWidget />
         <CalendarWidget />
-        <GmailWidget limit={10} />
+        <GmailWidget limit={30} />
         <TasksWidget />
         <NotionWidget />
         <DriveWidget />

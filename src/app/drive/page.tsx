@@ -30,8 +30,9 @@ export default function DrivePage() {
             display: "inline-flex", 
             alignItems: "center", 
             gap: "8px", 
-            color: "var(--text-muted)",
+            color: "var(--text-primary)",
             fontSize: "0.9rem",
+            fontWeight: 500,
             marginBottom: "16px",
             textDecoration: "none"
           }}
