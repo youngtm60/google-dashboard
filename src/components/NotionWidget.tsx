@@ -190,9 +190,10 @@ export default function NotionWidget({
                 borderRadius: "6px", 
                 fontSize: "0.7rem", 
                 fontWeight: 600,
-                background: viewMode === 'recent' ? "var(--accent-amber)" : "transparent",
-                color: viewMode === 'recent' ? "var(--text-primary)" : "var(--text-muted)",
-                transition: "all 0.2s"
+                background: viewMode === 'recent' ? "var(--accent-primary)" : "transparent",
+                color: viewMode === 'recent' ? "white" : "var(--text-muted)",
+                transition: "all 0.2s",
+                border: "none"
               }}
             >
               Recent
@@ -204,9 +205,10 @@ export default function NotionWidget({
                 borderRadius: "6px", 
                 fontSize: "0.7rem", 
                 fontWeight: 600,
-                background: viewMode === 'all' ? "var(--accent-amber)" : "transparent",
-                color: viewMode === 'all' ? "var(--text-primary)" : "var(--text-muted)",
-                transition: "all 0.2s"
+                background: viewMode === 'all' ? "var(--accent-primary)" : "transparent",
+                color: viewMode === 'all' ? "white" : "var(--text-muted)",
+                transition: "all 0.2s",
+                border: "none"
               }}
             >
               All
