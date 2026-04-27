@@ -35,9 +35,10 @@ export default function GmailWidget({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [folder, setFolder] = useState<'inbox' | 'all'>('inbox');
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 1000);
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 800);
     return () => clearTimeout(timer);
   }, [searchQuery]);
   
@@ -53,24 +54,25 @@ export default function GmailWidget({
     }
   };
 
-  // Use broader inbox fetch
-  const gmailQuery = viewMode === 'unread' ? 'is:unread' : 'label:INBOX';
+  // Construct API query
+  let apiQuery = folder === 'inbox' ? 'label:INBOX' : '';
+  if (viewMode === 'unread') {
+    apiQuery = 'is:unread';
+  }
+  
+  if (debouncedQuery) {
+    apiQuery = apiQuery ? `${apiQuery} ${debouncedQuery}` : debouncedQuery;
+  }
+
   const fetchLimit = fullPage ? 50 : limit;
 
-  const { data: messages, isLoading } = useSWR(`/api/workspace/gmail?limit=${fetchLimit}&q=${encodeURIComponent(gmailQuery)}`, fetcher, {
+  const { data: messages, isLoading } = useSWR(`/api/workspace/gmail?limit=${fetchLimit}&q=${encodeURIComponent(apiQuery)}`, fetcher, {
     refreshInterval: 1000 * 60 * 5,
   });
 
-    // Local filtering for search and sort by date
-  // MOVE THIS UP so we have access to it for the detail view
+  // Sort by date (API handles the filtering now)
   const displayMessages = (messages || [])
-    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .filter((msg: any) => {
-    const q = debouncedQuery.toLowerCase();
-    return msg.subject.toLowerCase().includes(q) || 
-           msg.from.toLowerCase().includes(q) ||
-           msg.snippet.toLowerCase().includes(q);
-  });
+    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   // Render Full Page Message Detail
   if (fullPage && urlMessageId) {
@@ -161,7 +163,7 @@ export default function GmailWidget({
         </div>
       )}
 
-      <div style={{ position: "relative", marginBottom: "20px", flexShrink: 0 }}>
+      <div style={{ position: "relative", marginBottom: "12px", flexShrink: 0 }}>
         <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
         <input
           type="text"
@@ -179,6 +181,29 @@ export default function GmailWidget({
             outline: "none"
           }}
         />
+      </div>
+
+      <div style={{ display: "flex", gap: "16px", marginBottom: "16px", paddingLeft: "4px", flexShrink: 0 }}>
+        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", color: folder === 'inbox' ? "var(--accent-primary)" : "var(--text-secondary)", cursor: "pointer", fontWeight: folder === 'inbox' ? 600 : 400 }}>
+          <input 
+            type="radio" 
+            name="mailFolder" 
+            checked={folder === 'inbox'} 
+            onChange={() => setFolder('inbox')} 
+            style={{ accentColor: "var(--accent-primary)", margin: 0 }}
+          />
+          Inbox
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", color: folder === 'all' ? "var(--accent-primary)" : "var(--text-secondary)", cursor: "pointer", fontWeight: folder === 'all' ? 600 : 400 }}>
+          <input 
+            type="radio" 
+            name="mailFolder" 
+            checked={folder === 'all'} 
+            onChange={() => setFolder('all')} 
+            style={{ accentColor: "var(--accent-primary)", margin: 0 }}
+          />
+          All Mail
+        </label>
       </div>
 
       <div 
