@@ -55,7 +55,7 @@ export default function GmailWidget({
   };
 
   // Construct API query
-  let apiQuery = folder === 'inbox' ? 'label:INBOX' : '';
+  let apiQuery = folder === 'inbox' ? 'label:INBOX' : '-in:spam -in:trash';
   if (viewMode === 'unread') {
     apiQuery = 'is:unread';
   }
