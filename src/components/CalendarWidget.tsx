@@ -205,7 +205,7 @@ export default function CalendarWidget({
     <section className={showHeader ? "glass-panel animate-fade-in" : "animate-fade-in"} style={{ padding: showHeader ? "20px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : "450px" }}>
       {showHeader && (
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-sky)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "white" }}>
             <Calendar size={20} />
             <h3 style={{ fontWeight: 600, color: "white" }}>Calendar</h3>
           </div>

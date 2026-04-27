@@ -108,7 +108,7 @@ export default function GmailWidget({
     <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "24px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "1000px" : (fullPage ? "100%" : "450px")}}>
       {showHeader && (
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center", flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "white" }}>
             <Mail size={20} />
             <h3 style={{ fontWeight: 600, color: "white" }}>Gmail</h3>
           </div>

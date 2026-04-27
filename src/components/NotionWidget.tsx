@@ -120,7 +120,7 @@ export default function NotionWidget({
     <section className={showHeader ? "glass-panel" : ""} style={{padding: showHeader ? "20px" : "0", borderRadius: "24px", display: "flex", flexDirection: "column", height: fullHeight ? "600px" : "450px"}}>
       {showHeader && (
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-amber)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "white" }}>
           <Notebook size={20} />
           <h3 style={{ fontWeight: 600, color: "white" }}>Notion</h3>
         </div>

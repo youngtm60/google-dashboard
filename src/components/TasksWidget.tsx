@@ -181,7 +181,7 @@ export default function TasksWidget({
         <>
           {/* Header */}
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "white" }}>
               <CheckSquare size={20} />
               <h3 style={{ fontWeight: 600, color: "white" }}>Tasks</h3>
             </div>
