@@ -318,13 +318,10 @@ export default function CalendarWidget({
         <Search size={14} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
         <input 
           type="text" 
+          className="search-input"
           placeholder="Search upcoming events..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)",
-            borderRadius: "10px", padding: "8px 12px 8px 36px", fontSize: "0.8rem", color: "var(--text-primary)", outline: "none"
-          }}
         />
       </div>
 

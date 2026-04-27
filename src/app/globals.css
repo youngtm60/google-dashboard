@@ -4,32 +4,28 @@ html {
 }
 
 :root {
-  /* Core Palette (Light Theme) */
-  --bg-deep: #B2C0D4; /* Soft off-white for the main background */
-  --bg-nebula: none; /* Removed the dark gradient */
-  --foreground: #111827; /* Dark text */
+  /* Backgrounds */
+  --bg-main: #0f172a;           /* Deep Navy */
+  --bg-card: #1e293b;           /* Lighter Navy Surface */
+  --bg-input: #334155;         /* Search bar background */
   
-  /* Panel and Card Tokens */
-  --glass-bg: #ffffff; /* Solid white */
-  --glass-border: rgba(0, 0, 0, 0.04);
-  --glass-highlight: #ffffff;
-  --glass-blur: none;
+  /* Accents */
+  --accent-primary: #3b82f6;    /* Vibrant Tech Blue */
+  --accent-secondary: #6366f1;  /* Indigo */
+  --success: #10b981;           /* Emerald */
   
-  /* Accent Colors */
-  --accent-primary: #6B5AED; /* Vibrant purple/indigo matching the screenshot */
-  --accent-secondary: #8B5CF6;
-  --accent-amber: #f59e0b;
-  --accent-emerald: #10b981;
-  --accent-cyan: #06b6d4;
-  --accent-sky: #0ea5e9;
-  --accent-rose: #f43f5e;
+  /* Text */
+  --text-primary: #f8fafc;         /* Off-white */
+  --text-secondary: #94a3b8;       /* Slate Gray */
+  --text-muted: #64748b;        /* Darker Slate */
   
-  /* Semantic Tokens */
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  
-  --sidebar-width: 220px; /* Widened slightly to fit the new text */
+  /* Structural Changes */
+  --radius-main: 10px;          /* Sharper, more "engineered" corners */
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.1);
+
+  --sidebar-width: 220px;
   --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -43,9 +39,7 @@ html {
 
 html, body {
   height: 100%;
-  background-color: var(--bg-deep);
-  background-image: var(--bg-nebula);
-  background-attachment: fixed;
+  background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow-x: auto;
@@ -70,23 +64,42 @@ html, body {
 
 /* Utilities */
 .glass-panel {
-  background: var(--glass-bg);
-  border-right: 1px solid var(--glass-border);
-  box-shadow: 1px 0 5px rgba(0, 0, 0, 0.02);
+  background: var(--bg-card);
+  border: var(--border-subtle);
+  border-radius: var(--radius-main);
+  box-shadow: var(--shadow-lg);
 }
 
 .glass-card {
-  background: var(--glass-highlight);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.02);
-  transition: var(--transition-smooth);
+  background: var(--bg-card);
+  border: var(--border-subtle);
+  border-radius: var(--radius-main);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(107, 90, 237, 0.15);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 15px rgba(0, 0, 0, 0.03);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  border-color: var(--accent-primary);
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.search-input {
+  background: var(--bg-input);
+  border: var(--border-subtle);
+  border-radius: var(--radius-main);
+  box-shadow: var(--shadow-lg);
+  padding: 8px 12px 8px 34px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  width: 100%;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
 .accent-text-gradient {
@@ -148,8 +161,8 @@ button {
   flex-direction: column;
   padding: 32px 20px;
   z-index: 50;
-  background: var(--glass-bg);
-  border-right: 1px solid var(--glass-border);
+  background: var(--bg-main);
+  border-right: var(--border-subtle);
   overflow-y: auto;
   transition: transform 0.3s ease;
 }

@@ -43,22 +43,14 @@ export default function DriveSearchWidget() {
         
         <input
           type="text"
+          className="search-input"
           placeholder="Search your Google Drive..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{
-            width: "100%",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid var(--glass-border)",
-            borderRadius: "16px",
             padding: "18px 54px",
-            color: "var(--text-primary)",
-            fontSize: "1.05rem",
-            outline: "none",
-            transition: "all 0.3s ease",
-            boxShadow: query ? "0 8px 32px rgba(0, 0, 0, 0.2)" : "none"
+            fontSize: "1.05rem"
           }}
-          className="focus-glow"
         />
 
         {query && (
