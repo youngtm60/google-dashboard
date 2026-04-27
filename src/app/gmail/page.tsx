@@ -27,7 +27,7 @@ function GmailPageContent() {
 
   return (
     <div className="animate-fade-in" style={{ paddingBottom: "100px" }}>
-      <header style={{ marginBottom: "40px" }}>
+      <header style={{ marginBottom: "20px" }}>
         <Link 
           href={messageId ? "/gmail" : "/"} 
           style={{ 
@@ -48,9 +48,6 @@ function GmailPageContent() {
           <Mail size={32} style={{ color: "var(--accent-primary)" }} />
           <h1 style={{ fontSize: "2.5rem", fontWeight: 800, color: "var(--accent-primary)" }}>Gmail</h1>
         </div>
-        <p style={{ color: "var(--text-secondary)", marginTop: "8px" }}>
-          Manage your correspondence with a high-density, glassmorphic interface.
-        </p>
       </header>
 
       {/* Unified Gmail Interface */}
