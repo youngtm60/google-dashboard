@@ -122,7 +122,7 @@ export default function NotionWidget({
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-amber)" }}>
           <Notebook size={20} />
-          <h3 style={{ fontWeight: 600 }}>Notion Notes</h3>
+          <h3 style={{ fontWeight: 600, color: "white" }}>Notion</h3>
         </div>
         
 
@@ -148,7 +148,8 @@ export default function NotionWidget({
               gap: "6px",
               fontWeight: 600,
               fontSize: "0.85rem",
-              textDecoration: "none"
+              textDecoration: "none",
+              whiteSpace: "nowrap"
             }}
           >
             <ExternalLink size={16} strokeWidth={2.5} /> Open Notion

@@ -183,7 +183,7 @@ export default function TasksWidget({
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
               <CheckSquare size={20} />
-              <h3 style={{ fontWeight: 600 }}>Tasks</h3>
+              <h3 style={{ fontWeight: 600, color: "white" }}>Tasks</h3>
             </div>
             
             {/* Sort & View Mode Toggles */}

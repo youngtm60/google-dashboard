@@ -77,7 +77,7 @@ export default function DriveWidget({
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-emerald)" }}>
             <Cloud size={20} />
-            <h3 style={{ fontWeight: 600 }}>Drive</h3>
+            <h3 style={{ fontWeight: 600, color: "white" }}>Drive</h3>
           </div>
           
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>

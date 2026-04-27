@@ -110,7 +110,7 @@ export default function GmailWidget({
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px", alignItems: "center", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "var(--accent-primary)" }}>
             <Mail size={20} />
-            <h3 style={{ fontWeight: 600 }}>Gmail</h3>
+            <h3 style={{ fontWeight: 600, color: "white" }}>Gmail</h3>
           </div>
           
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
