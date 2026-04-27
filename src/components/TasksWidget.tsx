@@ -200,7 +200,7 @@ export default function TasksWidget({
                       borderRadius: "8px", 
                       padding: "4px 8px", 
                       fontSize: "0.7rem", 
-                      color: "var(--text-muted)", 
+                      color: "white", 
                       outline: "none",
                       cursor: "pointer"
                     }}
