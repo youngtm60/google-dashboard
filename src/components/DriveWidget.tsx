@@ -86,7 +86,7 @@ export default function DriveWidget({
               onClick={() => window.open('https://drive.google.com', '_blank')}
               className="hover-opacity"
               style={{ 
-                background: "var(--accent-emerald)", 
+                background: "var(--accent-primary)", 
                 color: "white", 
                 border: "none", 
                 borderRadius: "10px", 

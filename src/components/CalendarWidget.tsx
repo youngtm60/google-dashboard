@@ -215,7 +215,7 @@ export default function CalendarWidget({
               onClick={() => window.open('https://calendar.google.com', '_blank')}
               className="hover-opacity"
               style={{ 
-                background: "var(--accent-sky)", 
+                background: "var(--accent-primary)", 
                 color: "white", 
                 border: "none", 
                 borderRadius: "10px", 
@@ -231,14 +231,14 @@ export default function CalendarWidget({
               title="Open official Google Calendar"
             >
               <ExternalLink size={14} />
-              Open
+              Open Calendar
             </button>
 
             <button 
               onClick={toggleSettings}
               className="hover-opacity"
               style={{ 
-                background: "var(--accent-sky)", 
+                background: "var(--accent-primary)", 
                 color: "white", 
                 border: "none", 
                 borderRadius: "10px", 
@@ -261,7 +261,7 @@ export default function CalendarWidget({
               onClick={() => setIsCreating(true)}
               className="hover-opacity"
               style={{ 
-                background: "var(--accent-sky)", 
+                background: "var(--accent-primary)", 
                 color: "white", 
                 border: "none", 
                 borderRadius: "10px", 
@@ -269,15 +269,14 @@ export default function CalendarWidget({
                 height: "32px", 
                 display: "flex", 
                 alignItems: "center", 
-                gap: "6px",
+                justifyContent: "center",
                 cursor: "pointer",
                 fontSize: "0.8rem",
                 fontWeight: 600
               }}
               title="Add New Event"
             >
-              <Plus size={16} />
-              Add
+              <Plus size={16} strokeWidth={3} />
             </button>
           </div>
         </div>

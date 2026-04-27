@@ -139,7 +139,7 @@ export default function NotionWidget({
             className="hover-opacity"
             title="Open Notion"
             style={{ 
-              background: "#FCD34D", 
+              background: "var(--accent-primary)", 
               color: "white", 
               padding: "6px 12px",
               borderRadius: "8px", 
@@ -225,7 +225,7 @@ export default function NotionWidget({
               height: "28px",
               borderRadius: "8px",
               border: "none",
-              background: "#FCD34D",
+              background: "var(--accent-primary)",
               color: "white"
             }}
           >
